@@ -40,9 +40,18 @@ namespace Vesperhold
             var bg = new GameObject("Backdrop");
             bg.transform.SetParent(transform, false);
             var sr = bg.AddComponent<SpriteRenderer>();
+            sr.sortingOrder = -100;
+            // Optional painted backdrop: drop a PNG named after the room theme (gate, hall, library, ...)
+            // into Assets/Resources/Art/Backdrops/. Falls back to a flat colour.
+            var tex = Resources.Load<Texture2D>("Art/Backdrops/" + Data.theme);
+            if (tex != null)
+            {
+                sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), tex.height / (float)(Data.h + 2));
+                bg.AddComponent<ParallaxBackdrop>().Init(Data, tex);
+                return;
+            }
             sr.sprite = SpriteFactory.Square;
             sr.color = p.Back;
-            sr.sortingOrder = -100;
             bg.transform.position = new Vector3(Data.w / 2f, -Data.h / 2f, 5);
             bg.transform.localScale = new Vector3(Data.w + 40, Data.h + 40, 1);
         }
