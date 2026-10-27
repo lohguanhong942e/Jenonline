@@ -1,0 +1,64 @@
+{
+ "enemies": [
+  {
+   "id": "skeleton",
+   "hp": 14,
+   "w": 9,
+   "h": 20,
+   "dmg": 4,
+   "xp": 14,
+   "goldMin": 3,
+   "goldMax": 8
+  },
+  {
+   "id": "bat",
+   "hp": 5,
+   "w": 11,
+   "h": 8,
+   "dmg": 3,
+   "xp": 8,
+   "goldMin": 1,
+   "goldMax": 4
+  },
+  {
+   "id": "ghost",
+   "hp": 10,
+   "w": 10,
+   "h": 16,
+   "dmg": 4,
+   "xp": 16,
+   "goldMin": 4,
+   "goldMax": 9
+  },
+  {
+   "id": "armor",
+   "hp": 32,
+   "w": 12,
+   "h": 25,
+   "dmg": 7,
+   "xp": 36,
+   "goldMin": 10,
+   "goldMax": 20
+  },
+  {
+   "id": "boss",
+   "hp": 150,
+   "w": 24,
+   "h": 46,
+   "dmg": 8,
+   "xp": 260,
+   "goldMin": 120,
+   "goldMax": 120
+  },
+  {
+   "id": "lord",
+   "hp": 260,
+   "w": 12,
+   "h": 32,
+   "dmg": 9,
+   "xp": 700,
+   "goldMin": 300,
+   "goldMax": 300
+  }
+ ]
+}

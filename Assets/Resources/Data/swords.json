@@ -1,0 +1,74 @@
+{
+ "swords": [
+  {
+   "n": "Iron Blade",
+   "atk": 0,
+   "rar": 0,
+   "info": "A plain blade that still holds a faint glow.",
+   "src": "Your starting sword."
+  },
+  {
+   "n": "Silver Blade",
+   "atk": 3,
+   "rar": 1,
+   "info": "Silver edge with a cold blue shine.",
+   "src": "Sold by Mirelda for 150 gold."
+  },
+  {
+   "n": "Moonsteel Blade",
+   "atk": 6,
+   "rar": 2,
+   "info": "Forged from a fallen moon rock. It curves like a crescent.",
+   "src": "Sold by Borin for 380 gold."
+  },
+  {
+   "n": "Ember Fang",
+   "atk": 4,
+   "rar": 1,
+   "info": "A wavy flame blade that never cools.",
+   "src": "Dropped by skeletons."
+  },
+  {
+   "n": "Frostbrand",
+   "atk": 5,
+   "rar": 2,
+   "info": "Jagged crystal ice that sparkles in the dark.",
+   "src": "Dropped by ghosts."
+  },
+  {
+   "n": "Venom Fang",
+   "atk": 5,
+   "rar": 2,
+   "info": "A serrated green saber that drips poison light.",
+   "src": "Dropped by bats."
+  },
+  {
+   "n": "Stormcaller",
+   "atk": 7,
+   "rar": 3,
+   "info": "A lightning bolt of a blade, crackling with sparks.",
+   "src": "Dropped by armor knights, rarely by ghosts."
+  },
+  {
+   "n": "Sunbreaker",
+   "atk": 8,
+   "rar": 3,
+   "info": "A broad golden blade that shines like noon. Gives +1 defence while equipped.",
+   "src": "Dropped by armor knights."
+  },
+  {
+   "n": "Bloodthirst",
+   "atk": 9,
+   "rar": 3,
+   "info": "A crimson scimitar that drinks the fallen. Heals 2 HP whenever you defeat an enemy.",
+   "src": "Dropped by the Bone Warden."
+  },
+  {
+   "n": "Void Reaver",
+   "atk": 12,
+   "rar": 4,
+   "info": "A blade from beyond the stars, wrapped in a violet void.",
+   "src": "Hidden in the Throne Gallery, or very rarely dropped by armor knights."
+  }
+ ]
+}
