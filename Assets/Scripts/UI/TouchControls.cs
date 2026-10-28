@@ -73,12 +73,19 @@ namespace Vesperhold
         {
             if (!TouchInput.Active || GameManager.Instance == null || GameManager.Instance.InMenu || GameManager.Instance.Paused) return;
             Layout();
-            var st = new GUIStyle(GUI.skin.label) { fontSize = 16, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
+            var st = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
+            var plate = UiArt.Tex("touch_round");
             for (int i = 0; i < btns.Length; i++)
             {
-                GUI.color = held[i] ? new Color(1f, 1f, 1f, 0.55f) : new Color(1f, 1f, 1f, 0.22f);
-                GUI.DrawTexture(btns[i].R, Texture2D.whiteTexture);
-                GUI.color = new Color(1f, 1f, 1f, 0.8f); GUI.Label(btns[i].R, btns[i].Label, st);
+                var r = btns[i].R;
+                float press = held[i] ? 0.9f : 1f;
+                GUI.color = held[i] ? new Color(1f, 1f, 1f, 0.95f) : new Color(1f, 1f, 1f, 0.6f);
+                if (plate != null) GUI.DrawTexture(new Rect(r.x + r.width * (1 - press) / 2, r.y + r.height * (1 - press) / 2, r.width * press, r.height * press), plate, ScaleMode.ScaleToFit);
+                else GUI.DrawTexture(r, Texture2D.whiteTexture);
+                string g = btns[i].Id == "J" ? "glyph_jump" : btns[i].Id == "A" ? "glyph_attack" : btns[i].Id == "D" ? "glyph_dash" : btns[i].Id == "P" ? "glyph_potion" : btns[i].Id == "E" ? "glyph_use" : null;
+                var gt = g == null ? null : UiArt.Tex(g);
+                if (gt != null) GUI.DrawTexture(new Rect(r.x + r.width * 0.22f, r.y + r.height * 0.22f, r.width * 0.56f, r.height * 0.56f), gt, ScaleMode.ScaleToFit);
+                else { GUI.color = new Color(1f, 0.9f, 0.6f, 0.95f); GUI.Label(r, btns[i].Label, st); }
             }
             GUI.color = Color.white;
         }

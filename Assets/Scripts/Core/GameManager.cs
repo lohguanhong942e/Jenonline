@@ -199,17 +199,17 @@ namespace Vesperhold
             float hl = UiScale.L, ht = UiScale.T;
             UiArt.Draw(new Rect(hl + 8, ht + 6, 44, 44), UiArt.Tex("crest_" + GameState.ClassId));
             GUI.Label(new Rect(hl + 58, ht + 8, 300, 30), "LV " + GameState.Level + "   " + GameState.ClassId, big);
-            DrawIcon(new Rect(hl + 10, ht + 42, 22, 22), "icon_heart");
-            Bar(new Rect(hl + 38, ht + 44, 220, 18), player.Hp / (float)GameState.MaxHp, new Color(0.8f, 0.2f, 0.2f), player.Hp + " / " + GameState.MaxHp);
-            DrawIcon(new Rect(hl + 10, ht + 66, 22, 22), "icon_mana");
-            Bar(new Rect(hl + 38, ht + 69, 220, 12), player.Mp / (float)GameState.MaxMp, new Color(0.25f, 0.5f, 0.9f), "");
-            Bar(new Rect(hl + 38, ht + 86, 220, 6), GameState.Xp / (float)GameData.XpToLevel(GameState.Level), new Color(0.9f, 0.75f, 0.3f), "");
+            DrawIcon(new Rect(hl + 8, ht + 56, 26, 26), "icon_heart");
+            UiArt.Bar(new Rect(hl + 46, ht + 60, 220, 16), player.Hp / (float)GameState.MaxHp, new Color(0.8f, 0.2f, 0.2f), player.Hp + " / " + GameState.MaxHp);
+            DrawIcon(new Rect(hl + 8, ht + 88, 26, 26), "icon_mana");
+            UiArt.Bar(new Rect(hl + 46, ht + 94, 220, 12), player.Mp / (float)GameState.MaxMp, new Color(0.25f, 0.5f, 0.9f), "");
+            Bar(new Rect(hl + 46, ht + 118, 220, 5), GameState.Xp / (float)GameData.XpToLevel(GameState.Level), new Color(0.9f, 0.75f, 0.3f), "");
             var right = new GUIStyle(big) { fontSize = 18, alignment = TextAnchor.MiddleLeft };
             float rx = W - UiScale.R - 14f, ry = ht + 8;
             rx -= 70; DrawIcon(new Rect(rx, ry, 22, 22), "icon_potion"); GUI.Label(new Rect(rx + 26, ry, 44, 22), GameState.Potions.ToString(), right);
             rx -= 90; DrawIcon(new Rect(rx, ry, 22, 22), "icon_heart"); GUI.Label(new Rect(rx + 26, ry, 64, 22), GameState.Hearts.ToString(), right);
             rx -= 120; DrawIcon(new Rect(rx, ry, 22, 22), "icon_gold"); GUI.Label(new Rect(rx + 26, ry, 94, 22), GameState.Gold.ToString(), right);
-            if (UiScale.Mobile && !(MenuUI.Instance != null && MenuUI.Instance.Open) && GUI.Button(new Rect(W - UiScale.R - 96, ry + 34, 84, 40), "Menu", UiArt.Button(15))) { Sfx.Play("click", 0.5f); if (MenuUI.Instance != null) MenuUI.Instance.OpenPause(); }
+            if (UiScale.Mobile && !(MenuUI.Instance != null && MenuUI.Instance.Open) && UiArt.IconButton(new Rect(W - UiScale.R - 64, ry + 34, 52, 52), "glyph_menu", "Menu")) { Sfx.Play("click", 0.5f); if (MenuUI.Instance != null) MenuUI.Instance.OpenPause(); }
             var boss = BossBrain.Current;
             if (boss != null && boss.E != null)
             {
@@ -219,11 +219,17 @@ namespace Vesperhold
                 var frame = UiArt.Tex("bossbar_frame");
                 var fr = new Rect(W / 2f - bwid / 2f, fy, bwid, fh);
                 var track = new Rect(fr.x + fr.width * 0.1f, fr.y + fr.height * 0.37f, fr.width * 0.8f, fr.height * 0.26f);
-                GUI.color = new Color(0.1f, 0.02f, 0.02f); GUI.DrawTexture(track, Texture2D.whiteTexture);
+                if (frame != null) GUI.DrawTexture(fr, frame, ScaleMode.StretchToFill);       // frame first, then the fill inside it
+                else { GUI.color = new Color(0.1f, 0.02f, 0.02f); GUI.DrawTexture(track, Texture2D.whiteTexture); }
                 GUI.color = new Color(0.85f, 0.2f, 0.18f); GUI.DrawTexture(new Rect(track.x, track.y, track.width * f, track.height), Texture2D.whiteTexture); GUI.color = Color.white;
-                if (frame != null) GUI.DrawTexture(fr, frame, ScaleMode.StretchToFill);
             }
-            if (toastT > 0) GUI.Label(new Rect(0, 100, W, 40), ToastText, new GUIStyle(big) { alignment = TextAnchor.MiddleCenter });
+            if (toastT > 0)
+            {
+                var tst = new GUIStyle(big) { alignment = TextAnchor.MiddleCenter };
+                float tw = Mathf.Min(W - 40, tst.CalcSize(new GUIContent(ToastText)).x + 80);
+                UiArt.Stretch(new Rect(W / 2 - tw / 2, 104, tw, 46), UiArt.Tex("toast_plate"));
+                GUI.Label(new Rect(W / 2 - tw / 2, 104, tw, 46), ToastText, tst);
+            }
             if (bannerT > 0)
             {
                 float bw = Mathf.Min(W * 0.7f, 640f);

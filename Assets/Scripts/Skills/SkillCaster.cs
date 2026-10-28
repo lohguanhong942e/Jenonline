@@ -238,17 +238,18 @@ namespace Vesperhold
                 var r = new Rect(x0 + i * (slot + gap), y, slot, slot);
                 bool on = Unlocked(i);
                 GUI.color = new Color(0, 0, 0, 0.7f); GUI.DrawTexture(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), Texture2D.whiteTexture); GUI.color = Color.white;
-                var frameArt = UiArt.Tex("slot_frame");
+                var frameArt = UiArt.Tex("slot_" + (i < 3 ? "common" : i < 6 ? "uncommon" : i < 9 ? "rare" : i < 11 ? "epic" : "legendary"));
+                if (frameArt != null) GUI.DrawTexture(new Rect(r.x - 5, r.y - 5, r.width + 10, r.height + 10), frameArt, ScaleMode.StretchToFill);
                 var ic = Icon(def.icon);
                 GUI.color = on ? Color.white : new Color(0.3f, 0.3f, 0.35f, 1f);
-                if (ic != null) GUI.DrawTexture(r, ic, ScaleMode.ScaleToFit); else { GUI.color = on ? Vfx.C(ColorKey) : Color.gray; GUI.DrawTexture(r, Texture2D.whiteTexture); }
+                var inner = new Rect(r.x + r.width * 0.09f, r.y + r.height * 0.09f, r.width * 0.82f, r.height * 0.82f);
+                if (ic != null) GUI.DrawTexture(inner, ic, ScaleMode.ScaleToFit); else { GUI.color = on ? Vfx.C(ColorKey) : Color.gray; GUI.DrawTexture(r, Texture2D.whiteTexture); }
                 if (on && cd[i] > 0 && cdMax[i] > 0)
                 {
                     GUI.color = new Color(0, 0, 0, 0.65f);
                     GUI.DrawTexture(new Rect(r.x, r.y, r.width, r.height * Mathf.Clamp01(cd[i] / cdMax[i])), Texture2D.whiteTexture);
                 }
                 GUI.color = Color.white;
-                if (frameArt != null) GUI.DrawTexture(new Rect(r.x - 4, r.y - 4, r.width + 8, r.height + 8), frameArt, ScaleMode.StretchToFill);
                 GUI.Label(new Rect(r.x + 3, r.y + 1, 20, 16), KeyLabels[i], small);
                 if (GUI.Button(r, GUIContent.none, GUIStyle.none)) Cast(i);
                 if (!on) GUI.Label(r, "Lv" + def.unlockLevel, mid);

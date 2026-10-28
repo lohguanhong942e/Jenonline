@@ -31,15 +31,29 @@ namespace Vesperhold
             float W = UiScale.W, H = UiScale.H;
             if (dlgT > 0)
             {
-                float w = Mathf.Min(W - 30, 760), h = 150, x = (W - w) / 2f, y = H - 270;
+                float w = Mathf.Min(W - 30, 780), h = w * 0.38f, x = (W - w) / 2f, y = H - UiScale.B - h - 90;
                 var panel = new Rect(x, y, w, h);
-                GUI.color = new Color(0, 0, 0, 0.78f); GUI.DrawTexture(panel, Texture2D.whiteTexture); GUI.color = Color.white;
-                UiArt.Stretch(panel, UiArt.Tex("panel_frame"));
+                var frameTex = UiArt.Tex("dialog_frame");
                 var pt = UiArt.Portrait(dlgPortrait);
-                if (pt != null) GUI.DrawTexture(new Rect(x + 16, y + 14, 122, 122), pt, ScaleMode.ScaleToFit);
-                float tx = pt != null ? x + 152 : x + 20;
-                GUI.color = new Color(1f, 0.85f, 0.45f); GUI.Label(new Rect(tx, y + 12, w - (tx - x) - 16, 26), dlgName, title); GUI.color = Color.white;
-                GUI.Label(new Rect(tx, y + 44, w - (tx - x) - 20, h - 54), dlgText, body);
+                float tx;
+                if (frameTex != null)
+                {
+                    GUI.DrawTexture(panel, frameTex, ScaleMode.StretchToFill);
+                    var socket = new Rect(x + w * 0.068f, y + h * 0.255f, w * 0.215f, h * 0.49f);
+                    if (pt != null) GUI.DrawTexture(socket, pt, ScaleMode.ScaleToFit);
+                    tx = x + w * 0.33f;
+                }
+                else
+                {
+                    GUI.color = new Color(0, 0, 0, 0.78f); GUI.DrawTexture(panel, Texture2D.whiteTexture); GUI.color = Color.white;
+                    UiArt.Stretch(panel, UiArt.Tex("panel_frame"));
+                    if (pt != null) GUI.DrawTexture(new Rect(x + 16, y + 14, 122, 122), pt, ScaleMode.ScaleToFit);
+                    tx = pt != null ? x + 152 : x + 20;
+                }
+                var np = new Rect(tx - 10, y + h * 0.08f, 230, 40);
+                UiArt.Stretch(np, UiArt.Tex("nameplate"));
+                GUI.Label(np, dlgName, new GUIStyle(title) { fontSize = 16, alignment = TextAnchor.MiddleCenter });
+                GUI.Label(new Rect(tx, y + h * 0.3f, w - (tx - x) - w * 0.06f, h * 0.6f), dlgText, body);
             }
             if (introT > 0)
             {
@@ -48,7 +62,8 @@ namespace Vesperhold
                 GUI.color = new Color(1, 1, 1, a);
                 var pt = UiArt.Portrait(introPortrait);
                 if (pt != null) GUI.DrawTexture(new Rect(W * 0.5f - 330, H * 0.3f - 20, 230, 230), pt, ScaleMode.ScaleToFit);
-                GUI.Label(new Rect(W * 0.5f - 80, H * 0.3f + 50, 520, 60), introTitle, new GUIStyle(title) { fontSize = 40 });
+                UiArt.Stretch(new Rect(W * 0.5f - 110, H * 0.3f + 36, 560, 90), UiArt.Tex("nameplate"));
+                GUI.Label(new Rect(W * 0.5f - 110, H * 0.3f + 36, 560, 80), introTitle, new GUIStyle(title) { fontSize = 36, alignment = TextAnchor.MiddleCenter });
                 GUI.Label(new Rect(W * 0.5f - 76, H * 0.3f + 110, 520, 30), "A guardian of Vesperhold blocks the way.", small);
                 GUI.color = Color.white;
             }
@@ -123,8 +138,7 @@ namespace Vesperhold
                 float tw = (w - 24) / 5f - 4;
                 for (int i = 0; i < 5; i++)
                 {
-                    GUI.color = (int)tab == i ? new Color(1f, 0.85f, 0.45f) : Color.white;
-                    if (GUI.Button(new Rect(win.x + 12 + i * (tw + 4), win.y + 10, tw, 32), names[i], tabBtn)) { tab = (Tab)i; Sfx.Play("click", 0.4f); }
+                    if (GUI.Button(new Rect(win.x + 12 + i * (tw + 4), win.y + 8, tw, 38), names[i], UiArt.Tab((int)tab == i))) { tab = (Tab)i; Sfx.Play("click", 0.4f); }
                 }
                 GUI.color = Color.white;
                 var content = new Rect(win.x + 14, win.y + 52, w - 28, h - 66);
@@ -137,6 +151,7 @@ namespace Vesperhold
                     default: Options(content); break;
                 }
             }
+            if (UiArt.IconButton(new Rect(win.xMax - 30, win.y - 14, 44, 44), "btn_close", "X")) SetOpen(false);
             if (noteT > 0) GUI.Label(new Rect(win.x, win.yMax - 26, win.width, 24), note, new GUIStyle(body) { alignment = TextAnchor.MiddleCenter });
         }
 
@@ -165,13 +180,19 @@ namespace Vesperhold
             {
                 var it = list[i]; var c = new Rect(r.x + (i % cols) * cell, r.y + (i / cols) * cell, cell - 3, cell - 3);
                 bool owned = GameState.Owns(it), eq = it.IsArmor ? GameState.Armor == it.Tier : (it.Kind == GameState.Kind && GameState.WeaponTier == it.Tier);
-                GUI.color = eq ? new Color(1f, 0.85f, 0.3f) : selected == it ? Color.white : ItemDb.RarityColor(it.Rarity) * 0.6f;
-                GUI.DrawTexture(new Rect(c.x - 2, c.y - 2, c.width + 4, c.height + 4), Texture2D.whiteTexture);
-                GUI.color = new Color(0.08f, 0.07f, 0.12f); GUI.DrawTexture(c, Texture2D.whiteTexture);
+                var slotArt = UiArt.Tex("slot_" + new[] { "common", "uncommon", "rare", "epic", "legendary" }[Mathf.Clamp(it.Rarity, 0, 4)]);
+                if (slotArt != null) { GUI.color = owned ? Color.white : new Color(0.45f, 0.45f, 0.5f); GUI.DrawTexture(new Rect(c.x - 2, c.y - 2, c.width + 4, c.height + 4), slotArt, ScaleMode.StretchToFill); GUI.color = Color.white; }
+                else
+                {
+                    GUI.color = eq ? new Color(1f, 0.85f, 0.3f) : selected == it ? Color.white : ItemDb.RarityColor(it.Rarity) * 0.6f;
+                    GUI.DrawTexture(new Rect(c.x - 2, c.y - 2, c.width + 4, c.height + 4), Texture2D.whiteTexture);
+                    GUI.color = new Color(0.08f, 0.07f, 0.12f); GUI.DrawTexture(c, Texture2D.whiteTexture);
+                }
                 var icon = Tex(it.Icon);
                 GUI.color = owned ? Color.white : new Color(0.2f, 0.2f, 0.24f, 1f);
-                if (icon != null) GUI.DrawTexture(c, icon, ScaleMode.ScaleToFit);
+                if (icon != null) GUI.DrawTexture(new Rect(c.x + c.width * 0.12f, c.y + c.height * 0.12f, c.width * 0.76f, c.height * 0.76f), icon, ScaleMode.ScaleToFit);
                 GUI.color = Color.white;
+                if (eq || selected == it) { GUI.color = eq ? new Color(1f, 0.85f, 0.3f, 0.35f) : new Color(1f, 1f, 1f, 0.2f); GUI.DrawTexture(c, Texture2D.whiteTexture); GUI.color = Color.white; }
                 if (GUI.Button(c, GUIContent.none, GUIStyle.none)) { selected = it; Sfx.Play("click", 0.4f); }
             }
         }
@@ -214,7 +235,7 @@ namespace Vesperhold
                 int val = i == 0 ? GameState.Str : i == 1 ? GameState.Dex : i == 2 ? GameState.Int : GameState.Luk;
                 GUI.Label(new Rect(r.x, y, 140, 30), n[i], body); GUI.Label(new Rect(r.x + 140, y, 50, 30), val.ToString(), title);
                 GUI.enabled = GameState.StatPoints > 0;
-                if (GUI.Button(new Rect(r.x + 200, y, 40, 30), "+", btn)) { GameState.StatPoints--; if (i == 0) GameState.Str++; else if (i == 1) GameState.Dex++; else if (i == 2) GameState.Int++; else GameState.Luk++; Sfx.Play("click", 0.5f); }
+                if (UiArt.IconButton(new Rect(r.x + 198, y - 2, 36, 36), "btn_plus", "+")) { GameState.StatPoints--; if (i == 0) GameState.Str++; else if (i == 1) GameState.Dex++; else if (i == 2) GameState.Int++; else GameState.Luk++; Sfx.Play("click", 0.5f); }
                 GUI.enabled = true;
                 GUI.Label(new Rect(r.x + 250, y + 4, r.width - 260, 30), eff[i], small);
             }
@@ -275,13 +296,13 @@ namespace Vesperhold
         {
             GUI.Label(new Rect(r.x, r.y, r.width, 28), "Options", title);
             float y = r.y + 44;
-            GUI.Label(new Rect(r.x, y, 160, 24), "Sound effects", body); Sfx.Volume = GUI.HorizontalSlider(new Rect(r.x + 170, y + 6, 240, 20), Sfx.Volume, 0f, 1f); y += 34;
-            GUI.Label(new Rect(r.x, y, 160, 24), "Music", body); Sfx.MusicVolume = GUI.HorizontalSlider(new Rect(r.x + 170, y + 6, 240, 20), Sfx.MusicVolume, 0f, 0.6f); y += 34;
-            Sfx.Muted = GUI.Toggle(new Rect(r.x, y, 300, 26), Sfx.Muted, " Mute everything"); y += 32;
-            TouchInput.Force = GUI.Toggle(new Rect(r.x, y, 360, 26), TouchInput.Force, " Show touch controls (phones show them automatically)"); y += 32;
-            Haptics.On = GUI.Toggle(new Rect(r.x, y, 300, 26), Haptics.On, " Vibration"); y += 32;
+            GUI.Label(new Rect(r.x, y, 160, 24), "Sound effects", body); Sfx.Volume = UiArt.Slider(new Rect(r.x + 170, y, 240, 28), Sfx.Volume, 0f, 1f); y += 38;
+            GUI.Label(new Rect(r.x, y, 160, 24), "Music", body); Sfx.MusicVolume = UiArt.Slider(new Rect(r.x + 170, y, 240, 28), Sfx.MusicVolume, 0f, 0.6f); y += 38;
+            Sfx.Muted = UiArt.Check(new Rect(r.x, y, 300, 28), Sfx.Muted, "Mute everything"); y += 36;
+            TouchInput.Force = UiArt.Check(new Rect(r.x, y, 460, 28), TouchInput.Force, "Show touch controls (phones show them automatically)"); y += 36;
+            Haptics.On = UiArt.Check(new Rect(r.x, y, 300, 28), Haptics.On, "Vibration"); y += 36;
             if (GUI.Button(new Rect(r.x, y, 200, 30), "Toggle fullscreen", btn)) WebBridge.ToggleFullscreen(); y += 40;
-            Perf.BatterySaver = GUI.Toggle(new Rect(r.x, y, 360, 26), Perf.BatterySaver, " Battery saver (30 fps)"); y += 44;
+            Perf.BatterySaver = UiArt.Check(new Rect(r.x, y, 360, 28), Perf.BatterySaver, "Battery saver (30 fps)"); y += 44;
             if (GUI.Button(new Rect(r.x, y, 160, 38), "Resume", btn)) SetOpen(false);
             if (GUI.Button(new Rect(r.x + 170, y, 160, 38), "Save game", btn)) { GameState.Save(); Note("Game saved."); }
             if (GUI.Button(new Rect(r.x + 340, y, 160, 38), "Quit to title", btn)) { SetOpen(false); GameManager.Instance.QuitToTitle(); }
@@ -295,14 +316,16 @@ namespace Vesperhold
             bool mirelda = shopId == "mirelda";
             var shopFace = UiArt.Portrait("npc_" + shopId);
             if (shopFace != null) GUI.DrawTexture(new Rect(win.xMax - 150, win.y + 14, 120, 120), shopFace, ScaleMode.ScaleToFit);
-            GUI.Label(new Rect(win.x + 16, win.y + 10, win.width - 32, 30), shopName + (mirelda ? " sells potions and light gear" : " forges heavy steel"), title);
-            GUI.Label(new Rect(win.x + 16, win.y + 42, win.width - 32, 24), "Gold: " + GameState.Gold, body);
+            var hdr = new Rect(win.x + 12, win.y + 6, Mathf.Min(560, win.width - 190), 76);
+            UiArt.Stretch(hdr, UiArt.Tex("shop_header"));
+            GUI.Label(new Rect(hdr.x + 40, hdr.y + 18, hdr.width - 80, 36), shopName, new GUIStyle(title) { fontSize = 20, alignment = TextAnchor.MiddleCenter });
+            GUI.Label(new Rect(win.x + 20, win.y + 84, 400, 24), (mirelda ? "Potions and light gear.   " : "Heavy steel for the stubborn.   ") + "Gold: " + GameState.Gold, body);
             var list = new List<ItemDef>();
             int lo = mirelda ? 2 : 8, hi = mirelda ? 9 : 18;
             foreach (var w in ItemDb.Weapons(GameState.Kind)) if (w.Tier >= lo && w.Tier <= hi) list.Add(w);
             int alo = mirelda ? 1 : 6, ahi = mirelda ? 8 : 18;
             foreach (var a in ItemDb.Armors()) if (a.Tier >= alo && a.Tier <= ahi) list.Add(a);
-            var view = new Rect(win.x + 16, win.y + 72, win.width - 32, win.height - 130);
+            var view = new Rect(win.x + 16, win.y + 112, win.width - 32, win.height - 168);
             UiScale.DragScroll(view, ref scroll2);
             scroll2 = GUI.BeginScrollView(view, scroll2, new Rect(0, 0, view.width - 20, 52 + list.Count * 46));
             // potion row
@@ -317,7 +340,7 @@ namespace Vesperhold
                 GUI.color = Color.white;
                 GUI.Label(new Rect(52, y + 22, view.width - 240, 20), (it.IsArmor ? "Defense +" + it.Def + "  HP +" + it.Hp : "Attack +" + it.Atk), small);
                 if (owned) GUI.Label(new Rect(view.width - 150, y + 6, 120, 30), "Owned", body);
-                else if (GUI.Button(new Rect(view.width - 190, y + 4, 160, 32), it.Price + " gold", btn))
+                else if (DrawPrice(new Rect(view.width - 190, y + 2, 160, 38), it.Price))
                 {
                     if (GameState.Gold >= it.Price) { GameState.Gold -= it.Price; GameState.Give(it); Sfx.Play("coin"); Note("Bought " + it.Name); }
                     else Note("Not enough gold.");
@@ -325,6 +348,15 @@ namespace Vesperhold
             }
             GUI.EndScrollView();
             if (GUI.Button(new Rect(win.xMax - 150, win.yMax - 48, 130, 36), "Leave", btn)) SetOpen(false);
+        }
+
+        // Price tag plate with a Buy click area over it. Returns true when pressed.
+        bool DrawPrice(Rect r, int price)
+        {
+            var tag = UiArt.Tex("price_tag");
+            if (tag != null) GUI.DrawTexture(r, tag, ScaleMode.StretchToFill);
+            GUI.Label(new Rect(r.x + 46, r.y, r.width - 54, r.height), price + " gold", new GUIStyle(body) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold });
+            return GUI.Button(r, GUIContent.none, GUIStyle.none);
         }
 
         void Note(string s) { note = s; noteT = 2f; }

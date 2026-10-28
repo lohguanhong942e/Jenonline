@@ -34,3 +34,11 @@ Rogue (male and female), Warrior female, Mage male, character animations, tilese
 - Art/Backdrops: field.jpg (Ashen Hunting Grounds) and depths.jpg (Ember Depths); a file named after the room id wins over the theme backdrop.
 - Where they are used: title screen (title_art + logo + class crests), HUD (icons, crest, boss bar frame), skill slots (slot_frame), menus and dialogue (panel_frame, button_plate), death and victory banners, NPC dialogue and shop portraits, boss intro cards, brazier/chest/candle/portal/relic/sealed gate sprites.
 - sword/key_sovereign has no use yet (the key is a chest reward); it is ready for an inventory entry.
+
+## UI kit (26 more Canva images, Art/UI)
+tab_inactive, tab_active, slot_common/uncommon/rare/epic/legendary, btn_close, btn_plus, slider_track, slider_knob, check_on, check_off, bar_frame, touch_round, glyph_attack/jump/dash/potion/use/menu, nameplate, toast_plate, shop_header, price_tag, dialog_frame.
+- Menu and shop windows: painted panel frame, tab plates, rarity slot frames for every weapon and armor, close and plus buttons, painted sliders and checkboxes, shop header sign and price tags.
+- HUD: framed health and mana bars, toast plate behind messages, framed boss bar, skill slots with rarity frames (higher skills get fancier frames).
+- Dialogue: NPC dialogue box with portrait socket and name ribbon; boss intro uses the ribbon too.
+- Touch controls: round plates with painted attack, jump, dash, potion and use glyphs; a menu glyph button on phones.
+- The older `slot_frame.png` and `panel_frame.png` are still used as fallbacks.
