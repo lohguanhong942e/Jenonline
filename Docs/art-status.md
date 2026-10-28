@@ -26,3 +26,11 @@ Rogue (male and female), Warrior female, Mage male, character animations, tilese
 - Backdrops (1280x720 JPG, Canva): gate, hall, library, chapel, catacomb, under, armory, tower, throne in Assets/Resources/Art/Backdrops. All nine themes now have painted backdrops.
 - Tiles are generated in code (World/TileArt.cs); painted tiles could replace them later.
 - Still missing: female warrior, male mage, female rogue, real animation frames.
+
+## 30 more Canva images (UI and props)
+- Art/UI: logo, title_art, panel_frame, slot_frame, button_plate, bossbar_frame, banner_victory, banner_gameover, icon_heart, icon_mana, icon_gold, icon_potion, crest_warrior, crest_mage, crest_rogue.
+- Art/Props: brazier, chest, candle, portal, relic_feather, relic_shadowstep, key_sovereign, gate_sealed.
+- Art/Portraits: npc_sexton, npc_mirelda, npc_borin, portrait_bone_warden, portrait_lord_vesper.
+- Art/Backdrops: field.jpg (Ashen Hunting Grounds) and depths.jpg (Ember Depths); a file named after the room id wins over the theme backdrop.
+- Where they are used: title screen (title_art + logo + class crests), HUD (icons, crest, boss bar frame), skill slots (slot_frame), menus and dialogue (panel_frame, button_plate), death and victory banners, NPC dialogue and shop portraits, boss intro cards, brazier/chest/candle/portal/relic/sealed gate sprites.
+- sword/key_sovereign has no use yet (the key is a chest reward); it is ready for an inventory entry.

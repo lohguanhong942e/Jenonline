@@ -69,6 +69,16 @@ namespace Vesperhold
             return sr;
         }
 
+        // Swap a placeholder box for painted art: art sits on the object's feet at the given world height.
+        public static bool Skin(SpriteRenderer sr, string path, float height)
+        {
+            var spr = LoadSprite(path, height, false);
+            if (spr == null || sr == null) return false;
+            sr.sprite = spr; sr.color = Color.white; sr.sortingOrder = 5;
+            sr.transform.localPosition = Vector3.zero; sr.transform.localScale = Vector3.one;
+            return true;
+        }
+
         public static Sprite LoadSprite(string path, float height, bool pixel = false)
         {
             var tex = Resources.Load<Texture2D>(path);

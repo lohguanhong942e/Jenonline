@@ -48,7 +48,14 @@ namespace Vesperhold
             var go = new GameObject(typeof(T).Name);
             go.transform.SetParent(parent, false);
             go.transform.position = feet;
-            SpriteFactory.Box(go.transform, "Body", c, size, new Vector2(0, size.y / 2f), 5);
+            var body = SpriteFactory.Box(go.transform, "Body", c, size, new Vector2(0, size.y / 2f), 5);
+            switch (typeof(T).Name)      // painted art from Resources/Art/Props when present
+            {
+                case "SavePoint": SpriteFactory.Skin(body, "Art/Props/brazier", 1.7f); break;
+                case "Chest": SpriteFactory.Skin(body, "Art/Props/chest", 0.95f); break;
+                case "Candle": SpriteFactory.Skin(body, "Art/Props/candle", 1.0f); break;
+                case "Portal": SpriteFactory.Skin(body, "Art/Props/portal", 2.4f); break;
+            }
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true; col.size = size; col.offset = new Vector2(0, size.y / 2f);
             return go.AddComponent<T>();
@@ -143,7 +150,15 @@ namespace Vesperhold
             GameState.Save();
             Destroy(gameObject);
         }
-        void Start() { if (GameState.Flags.Contains(Kind)) Destroy(gameObject); }
+        SpriteRenderer art; float t;
+        void Start()
+        {
+            if (GameState.Flags.Contains(Kind)) { Destroy(gameObject); return; }
+            art = GetComponentInChildren<SpriteRenderer>();
+            SpriteFactory.Skin(art, Kind == "dj" ? "Art/Props/relic_feather" : "Art/Props/relic_shadowstep", 1.0f);
+            Lighting.Point(transform, new Vector3(0, 0.5f, 0), 4f, Kind == "dj" ? new Color(0.5f, 0.7f, 1f) : new Color(0.7f, 0.4f, 1f), 1f);
+        }
+        void Update() { t += Time.deltaTime; if (art != null) art.transform.localPosition = new Vector3(0, -0.2f + Mathf.Sin(t * 3f) * 0.12f, 0); }
     }
 
     public class Portal : Interactable
@@ -165,7 +180,7 @@ namespace Vesperhold
         public override void Use(PlayerController p)
         {
             if (e.talk == "mirelda" || e.talk == "borin") { MenuUI.Instance.OpenShop(e.talk, e.name); return; }
-            GameManager.Instance.Toast(e.name + ": " + Hint());
+            MenuUI.Instance.Say("npc_" + e.talk, e.name, Hint());
         }
 
         static string Hint()

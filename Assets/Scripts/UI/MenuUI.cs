@@ -20,6 +20,40 @@ namespace Vesperhold
 
         void Awake() { Instance = this; }
 
+        // Short dialogue box with a portrait (NPCs) and a boss intro card, both drawn even while the menu is closed.
+        string dlgPortrait, dlgName, dlgText; float dlgT;
+        string introPortrait, introTitle; float introT;
+        public void Say(string portrait, string name, string text) { dlgPortrait = portrait; dlgName = name; dlgText = text; dlgT = 6f; Sfx.Play("click", 0.4f); }
+        public void BossIntro(string portrait, string title) { introPortrait = portrait; introTitle = title; introT = 2.8f; }
+
+        void DrawOverlays()
+        {
+            float W = Screen.width, H = Screen.height;
+            if (dlgT > 0)
+            {
+                float w = Mathf.Min(W - 30, 760), h = 150, x = (W - w) / 2f, y = H - 270;
+                var panel = new Rect(x, y, w, h);
+                GUI.color = new Color(0, 0, 0, 0.78f); GUI.DrawTexture(panel, Texture2D.whiteTexture); GUI.color = Color.white;
+                UiArt.Stretch(panel, UiArt.Tex("panel_frame"));
+                var pt = UiArt.Portrait(dlgPortrait);
+                if (pt != null) GUI.DrawTexture(new Rect(x + 16, y + 14, 122, 122), pt, ScaleMode.ScaleToFit);
+                float tx = pt != null ? x + 152 : x + 20;
+                GUI.color = new Color(1f, 0.85f, 0.45f); GUI.Label(new Rect(tx, y + 12, w - (tx - x) - 16, 26), dlgName, title); GUI.color = Color.white;
+                GUI.Label(new Rect(tx, y + 44, w - (tx - x) - 20, h - 54), dlgText, body);
+            }
+            if (introT > 0)
+            {
+                float a = Mathf.Clamp01(Mathf.Min(introT / 0.5f, (2.8f - introT) / 0.3f));
+                GUI.color = new Color(0, 0, 0, 0.72f * a); GUI.DrawTexture(new Rect(0, H * 0.3f, W, 190), Texture2D.whiteTexture);
+                GUI.color = new Color(1, 1, 1, a);
+                var pt = UiArt.Portrait(introPortrait);
+                if (pt != null) GUI.DrawTexture(new Rect(W * 0.5f - 330, H * 0.3f - 20, 230, 230), pt, ScaleMode.ScaleToFit);
+                GUI.Label(new Rect(W * 0.5f - 80, H * 0.3f + 50, 520, 60), introTitle, new GUIStyle(title) { fontSize = 40 });
+                GUI.Label(new Rect(W * 0.5f - 76, H * 0.3f + 110, 520, 30), "A guardian of Vesperhold blocks the way.", small);
+                GUI.color = Color.white;
+            }
+        }
+
         public void OpenShop(string id, string name)
         {
             shopMode = true; shopId = id; shopName = name; selected = null; SetOpen(true);
@@ -35,6 +69,8 @@ namespace Vesperhold
         void Update()
         {
             if (noteT > 0) noteT -= Time.unscaledDeltaTime;
+            if (dlgT > 0) dlgT -= Time.unscaledDeltaTime;
+            if (introT > 0) introT -= Time.unscaledDeltaTime;
             var kb = Keyboard.current; var gm = GameManager.Instance;
             if (kb == null || gm == null || gm.InMenu || !gm.InRun) return;
             if (kb.escapeKey.wasPressedThisFrame) { if (Open) SetOpen(false); else if (!gm.Paused) { shopMode = false; tab = Tab.Options; SetOpen(true); } }
@@ -62,18 +98,20 @@ namespace Vesperhold
             title = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
             body = new GUIStyle(GUI.skin.label) { fontSize = 15, wordWrap = true };
             small = new GUIStyle(GUI.skin.label) { fontSize = 12, wordWrap = true };
-            btn = new GUIStyle(GUI.skin.button) { fontSize = 15 };
-            tabBtn = new GUIStyle(GUI.skin.button) { fontSize = 15, fontStyle = FontStyle.Bold };
+            btn = UiArt.Button(15);
+            tabBtn = UiArt.Button(15);
         }
 
         void OnGUI()
         {
-            if (!Open) return;
             Styles();
+            if (GameManager.Instance != null && GameManager.Instance.InRun) DrawOverlays();
+            if (!Open) return;
             float w = Mathf.Min(Screen.width - 24, 900), h = Mathf.Min(Screen.height - 24, 580);
             var win = new Rect((Screen.width - w) / 2f, (Screen.height - h) / 2f, w, h);
-            GUI.color = new Color(0.04f, 0.03f, 0.08f, 0.96f); GUI.DrawTexture(win, Texture2D.whiteTexture);
-            GUI.color = new Color(0.8f, 0.65f, 0.3f); GUI.DrawTexture(new Rect(win.x, win.y, win.width, 2), Texture2D.whiteTexture); GUI.color = Color.white;
+            GUI.color = new Color(0.04f, 0.03f, 0.08f, 0.97f); GUI.DrawTexture(win, Texture2D.whiteTexture); GUI.color = Color.white;
+            if (!UiArt.Stretch(new Rect(win.x - 8, win.y - 8, win.width + 16, win.height + 16), UiArt.Tex("panel_frame")))
+            { GUI.color = new Color(0.8f, 0.65f, 0.3f); GUI.DrawTexture(new Rect(win.x, win.y, win.width, 2), Texture2D.whiteTexture); GUI.color = Color.white; }
             if (shopMode) { Shop(win); }
             else
             {
@@ -247,6 +285,8 @@ namespace Vesperhold
         void Shop(Rect win)
         {
             bool mirelda = shopId == "mirelda";
+            var shopFace = UiArt.Portrait("npc_" + shopId);
+            if (shopFace != null) GUI.DrawTexture(new Rect(win.xMax - 150, win.y + 14, 120, 120), shopFace, ScaleMode.ScaleToFit);
             GUI.Label(new Rect(win.x + 16, win.y + 10, win.width - 32, 30), shopName + (mirelda ? " sells potions and light gear" : " forges heavy steel"), title);
             GUI.Label(new Rect(win.x + 16, win.y + 42, win.width - 32, 24), "Gold: " + GameState.Gold, body);
             var list = new List<ItemDef>();

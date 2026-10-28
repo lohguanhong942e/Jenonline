@@ -44,7 +44,8 @@ namespace Vesperhold
             sr.sortingOrder = -100;
             // Optional painted backdrop: drop a PNG named after the room theme (gate, hall, library, ...)
             // into Assets/Resources/Art/Backdrops/. Falls back to a flat colour.
-            var tex = Resources.Load<Texture2D>("Art/Backdrops/" + Data.theme);
+            var tex = Resources.Load<Texture2D>("Art/Backdrops/" + Data.id);          // room-specific art first (field, depths)
+            if (tex == null) tex = Resources.Load<Texture2D>("Art/Backdrops/" + Data.theme);
             if (tex == null) tex = TileArt.Backdrop(Data.theme);
             if (tex != null)
             {
@@ -165,11 +166,17 @@ namespace Vesperhold
             float h = Data.gate.r1 - Data.gate.r0 + 1;
             sealedGate.transform.position = new Vector3(Data.gate.c + 0.5f, -(Data.gate.r0 + h / 2f), 0);
             var sr = sealedGate.AddComponent<SpriteRenderer>();
-            sr.sprite = SpriteFactory.Square;
-            sr.color = new Color(0.55f, 0.2f, 0.7f);
-            sealedGate.transform.localScale = new Vector3(1, h, 1);
-            var box = sealedGate.AddComponent<BoxCollider2D>();
-            box.size = Vector2.one;
+            var art = SpriteFactory.LoadSprite("Art/Props/gate_sealed", h, false);
+            if (art != null) { sr.sprite = art; sr.sortingOrder = 3; sealedGate.transform.position = new Vector3(Data.gate.c + 0.5f, -(Data.gate.r1 + 1), 0); sealedGate.transform.localScale = Vector3.one;
+                var gb = sealedGate.AddComponent<BoxCollider2D>(); gb.size = new Vector2(1f, h); gb.offset = new Vector2(0, h / 2f); }
+            else
+            {
+                sr.sprite = SpriteFactory.Square;
+                sr.color = new Color(0.55f, 0.2f, 0.7f);
+                sealedGate.transform.localScale = new Vector3(1, h, 1);
+                var box = sealedGate.AddComponent<BoxCollider2D>();
+                box.size = Vector2.one;
+            }
         }
 
         public void OpenGate()

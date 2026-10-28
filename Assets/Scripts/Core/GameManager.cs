@@ -13,6 +13,7 @@ namespace Vesperhold
         public string ToastText = ""; float toastT;
         Camera cam; Transform world; PlayerController player;
         float shake, hitStop; bool changing; bool showMenu = true, showWin, pickClass;
+        float bannerT;
         public bool InMenu { get { return showMenu; } }
         public bool InRun { get { return !showMenu && !showWin && player != null; } }
         public void SetPaused(bool p) { Paused = p; }
@@ -96,6 +97,7 @@ namespace Vesperhold
         void Update()
         {
             if (toastT > 0) toastT -= Time.unscaledDeltaTime;
+            if (bannerT > 0) bannerT -= Time.unscaledDeltaTime;
             if (hitStop > 0) { hitStop -= Time.unscaledDeltaTime; Time.timeScale = hitStop > 0 ? 0.05f : 1f; }
             Sfx.MusicTick(InRun, BossBrain.Current != null);
         }
@@ -126,7 +128,7 @@ namespace Vesperhold
         public void OnPlayerDied() { StartCoroutine(Respawn()); }
         IEnumerator Respawn()
         {
-            Toast("You have fallen. Waking at the last brazier.");
+            Toast("You have fallen. Waking at the last brazier."); bannerT = 2.4f;
             yield return new WaitForSecondsRealtime(1.8f);
             GameState.Gold -= GameState.Gold / 10;
             Paused = true; yield return null;
@@ -137,54 +139,86 @@ namespace Vesperhold
 
         void OnGUI()
         {
+            float W = Screen.width, H = Screen.height;
             var big = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
+            var btn = UiArt.Button(22);
             if (showMenu)
             {
-                GUI.Box(new Rect(0, 0, Screen.width, Screen.height), GUIContent.none);
-                var title = new GUIStyle(big) { fontSize = 54, alignment = TextAnchor.MiddleCenter };
-                GUI.Label(new Rect(0, Screen.height * 0.2f, Screen.width, 90), "VESPERHOLD", title);
-                var btn = new GUIStyle(GUI.skin.button) { fontSize = 22 };
+                var bgArt = UiArt.Tex("title_art");
+                if (bgArt != null) { GUI.DrawTexture(new Rect(0, 0, W, H), bgArt, ScaleMode.ScaleAndCrop); GUI.color = new Color(0, 0, 0, 0.35f); GUI.DrawTexture(new Rect(0, 0, W, H), Texture2D.whiteTexture); GUI.color = Color.white; }
+                else GUI.Box(new Rect(0, 0, W, H), GUIContent.none);
+                float lw = Mathf.Min(W * 0.75f, 680f);
+                if (!UiArt.Draw(new Rect(W / 2 - lw / 2, H * 0.05f, lw, lw * 0.5f), UiArt.Tex("logo")))
+                    GUI.Label(new Rect(0, H * 0.2f, W, 90), "VESPERHOLD", new GUIStyle(big) { fontSize = 54, alignment = TextAnchor.MiddleCenter });
                 if (pickClass)
                 {
-                    GUI.Label(new Rect(0, Screen.height * 0.36f, Screen.width, 40), "Choose your class", new GUIStyle(big) { alignment = TextAnchor.MiddleCenter });
-                    float bw = 220, bx = Screen.width / 2f - (3 * bw + 40) / 2f;
-                    string[] ids = { "warrior", "mage", "rogue" };
+                    GUI.Label(new Rect(0, H * 0.4f, W, 40), "Choose your class", new GUIStyle(big) { alignment = TextAnchor.MiddleCenter });
+                    float cw = Mathf.Min(220f, (W - 60f) / 3f), bx = W / 2f - (3 * cw + 24) / 2f; string[] ids = { "warrior", "mage", "rogue" };
                     for (int i = 0; i < 3; i++)
                     {
                         var cd = GameState_Class(ids[i]);
-                        var r = new Rect(bx + i * (bw + 20), Screen.height * 0.45f, bw, 120);
-                        if (GUI.Button(r, cd == null ? ids[i] : cd.name + "\n" + cd.desc, new GUIStyle(btn) { fontSize = 16, wordWrap = true })) StartRun(false, ids[i]);
+                        var card = new Rect(bx + i * (cw + 12), H * 0.47f, cw, Mathf.Min(300f, H * 0.42f));
+                        GUI.color = new Color(0, 0, 0, 0.55f); GUI.DrawTexture(card, Texture2D.whiteTexture); GUI.color = Color.white;
+                        UiArt.Draw(new Rect(card.x + cw / 2 - 48, card.y + 8, 96, 96), UiArt.Tex("crest_" + ids[i]));
+                        GUI.Label(new Rect(card.x + 8, card.y + 106, cw - 16, 28), cd == null ? ids[i] : cd.name, new GUIStyle(big) { fontSize = 20, alignment = TextAnchor.MiddleCenter });
+                        GUI.Label(new Rect(card.x + 10, card.y + 134, cw - 20, 60), cd == null ? "" : cd.desc, new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = true, alignment = TextAnchor.UpperCenter });
+                        if (GUI.Button(new Rect(card.x + 12, card.yMax - 58, cw - 24, 46), "Choose", UiArt.Button(18))) { Sfx.Play("click", 0.6f); StartRun(false, ids[i]); }
                     }
-                    if (GUI.Button(new Rect(Screen.width / 2 - 60, Screen.height * 0.45f + 140, 120, 36), "Back")) pickClass = false;
+                    if (GUI.Button(new Rect(W / 2 - 70, H * 0.47f + Mathf.Min(300f, H * 0.42f) + 10, 140, 40), "Back", UiArt.Button(16))) pickClass = false;
                     return;
                 }
-                if (GUI.Button(new Rect(Screen.width / 2 - 130, Screen.height * 0.5f, 260, 50), "Begin the Quest", btn)) pickClass = true;
-                if (GameState.HasSave() && GUI.Button(new Rect(Screen.width / 2 - 130, Screen.height * 0.5f + 62, 260, 50), "Continue", btn)) StartRun(true);
+                if (GUI.Button(new Rect(W / 2 - 140, H * 0.58f, 280, 56), "Begin the Quest", btn)) { Sfx.Play("click", 0.6f); pickClass = true; }
+                if (GameState.HasSave() && GUI.Button(new Rect(W / 2 - 140, H * 0.58f + 66, 280, 56), "Continue", btn)) { Sfx.Play("click", 0.6f); StartRun(true); }
                 return;
             }
             if (showWin)
             {
-                GUI.Box(new Rect(0, 0, Screen.width, Screen.height), GUIContent.none);
-                GUI.Label(new Rect(0, Screen.height * 0.3f, Screen.width, 80), "The Night Lifts", new GUIStyle(big) { fontSize = 54, alignment = TextAnchor.MiddleCenter });
-                GUI.Label(new Rect(0, Screen.height * 0.3f + 90, Screen.width, 40), "Lord Vesper is ash, and pale dawn touches the old towers. The valley is free.", new GUIStyle(big) { fontSize = 20, alignment = TextAnchor.MiddleCenter });
-                if (GUI.Button(new Rect(Screen.width / 2 - 130, Screen.height * 0.6f, 260, 50), "Return to Title", new GUIStyle(GUI.skin.button) { fontSize = 22 })) ReturnToTitle();
+                GUI.color = new Color(0, 0, 0, 0.8f); GUI.DrawTexture(new Rect(0, 0, W, H), Texture2D.whiteTexture); GUI.color = Color.white;
+                float bw = Mathf.Min(W * 0.8f, 720f);
+                if (!UiArt.Draw(new Rect(W / 2 - bw / 2, H * 0.1f, bw, bw * 0.49f), UiArt.Tex("banner_victory")))
+                    GUI.Label(new Rect(0, H * 0.3f, W, 80), "The Night Lifts", new GUIStyle(big) { fontSize = 54, alignment = TextAnchor.MiddleCenter });
+                GUI.Label(new Rect(20, H * 0.1f + bw * 0.52f, W - 40, 60), "Lord Vesper is ash, and pale dawn touches the old towers. The valley is free.", new GUIStyle(big) { fontSize = 20, wordWrap = true, alignment = TextAnchor.UpperCenter });
+                if (GUI.Button(new Rect(W / 2 - 140, H * 0.1f + bw * 0.52f + 70, 280, 56), "Return to Title", btn)) ReturnToTitle();
                 return;
             }
             if (player == null) return;
-            GUI.Label(new Rect(16, 8, 400, 30), "LV " + GameState.Level + "   " + GameState.ClassId, big);
-            Bar(new Rect(16, 40, 220, 18), player.Hp / (float)GameState.MaxHp, new Color(0.8f, 0.2f, 0.2f), player.Hp + " / " + GameState.MaxHp);
-            Bar(new Rect(16, 62, 220, 12), player.Mp / (float)GameState.MaxMp, new Color(0.25f, 0.5f, 0.9f), "");
-            Bar(new Rect(16, 78, 220, 6), GameState.Xp / (float)GameData.XpToLevel(GameState.Level), new Color(0.9f, 0.75f, 0.3f), "");
-            GUI.Label(new Rect(Screen.width - 330, 8, 320, 30), "Gold " + GameState.Gold + "   Potions " + GameState.Potions + "   Hearts " + GameState.Hearts, new GUIStyle(big) { alignment = TextAnchor.UpperRight });
+            // HUD: class crest, level, health, mana, XP.
+            UiArt.Draw(new Rect(8, 6, 44, 44), UiArt.Tex("crest_" + GameState.ClassId));
+            GUI.Label(new Rect(58, 8, 300, 30), "LV " + GameState.Level + "   " + GameState.ClassId, big);
+            DrawIcon(new Rect(10, 42, 22, 22), "icon_heart");
+            Bar(new Rect(38, 44, 220, 18), player.Hp / (float)GameState.MaxHp, new Color(0.8f, 0.2f, 0.2f), player.Hp + " / " + GameState.MaxHp);
+            DrawIcon(new Rect(10, 66, 22, 22), "icon_mana");
+            Bar(new Rect(38, 69, 220, 12), player.Mp / (float)GameState.MaxMp, new Color(0.25f, 0.5f, 0.9f), "");
+            Bar(new Rect(38, 86, 220, 6), GameState.Xp / (float)GameData.XpToLevel(GameState.Level), new Color(0.9f, 0.75f, 0.3f), "");
+            var right = new GUIStyle(big) { fontSize = 18, alignment = TextAnchor.MiddleLeft };
+            float rx = W - 14f;
+            rx -= 70; DrawIcon(new Rect(rx, 8, 22, 22), "icon_potion"); GUI.Label(new Rect(rx + 26, 8, 44, 22), GameState.Potions.ToString(), right);
+            rx -= 90; DrawIcon(new Rect(rx, 8, 22, 22), "icon_heart"); GUI.Label(new Rect(rx + 26, 8, 64, 22), GameState.Hearts.ToString(), right);
+            rx -= 120; DrawIcon(new Rect(rx, 8, 22, 22), "icon_gold"); GUI.Label(new Rect(rx + 26, 8, 94, 22), GameState.Gold.ToString(), right);
             var boss = BossBrain.Current;
             if (boss != null && boss.E != null)
             {
-                float bwid = Mathf.Min(Screen.width * 0.6f, 420f);
-                GUI.Label(new Rect(Screen.width / 2f - bwid / 2f, 44, bwid, 24), boss.Title, new GUIStyle(big) { fontSize = 18, alignment = TextAnchor.MiddleCenter });
-                Bar(new Rect(Screen.width / 2f - bwid / 2f, 70, bwid, 12), Mathf.Max(0, boss.E.Hp) / (float)boss.E.MaxHp, new Color(0.85f, 0.25f, 0.2f), "");
+                float bwid = Mathf.Min(W * 0.6f, 460f), fh = bwid * 0.145f, fy = 40f;
+                GUI.Label(new Rect(W / 2f - bwid / 2f, 14, bwid, 24), boss.Title, new GUIStyle(big) { fontSize = 18, alignment = TextAnchor.MiddleCenter });
+                float f = Mathf.Clamp01(Mathf.Max(0, boss.E.Hp) / (float)boss.E.MaxHp);
+                var frame = UiArt.Tex("bossbar_frame");
+                var fr = new Rect(W / 2f - bwid / 2f, fy, bwid, fh);
+                var track = new Rect(fr.x + fr.width * 0.1f, fr.y + fr.height * 0.37f, fr.width * 0.8f, fr.height * 0.26f);
+                GUI.color = new Color(0.1f, 0.02f, 0.02f); GUI.DrawTexture(track, Texture2D.whiteTexture);
+                GUI.color = new Color(0.85f, 0.2f, 0.18f); GUI.DrawTexture(new Rect(track.x, track.y, track.width * f, track.height), Texture2D.whiteTexture); GUI.color = Color.white;
+                if (frame != null) GUI.DrawTexture(fr, frame, ScaleMode.StretchToFill);
             }
-            if (toastT > 0) GUI.Label(new Rect(0, 60, Screen.width, 40), ToastText, new GUIStyle(big) { alignment = TextAnchor.MiddleCenter });
+            if (toastT > 0) GUI.Label(new Rect(0, 100, W, 40), ToastText, new GUIStyle(big) { alignment = TextAnchor.MiddleCenter });
+            if (bannerT > 0)
+            {
+                float bw = Mathf.Min(W * 0.7f, 640f);
+                var old = GUI.color; GUI.color = new Color(1, 1, 1, Mathf.Clamp01(bannerT / 0.6f));
+                if (!UiArt.Draw(new Rect(W / 2 - bw / 2, H * 0.3f, bw, bw * 0.42f), UiArt.Tex("banner_gameover"))) GUI.Label(new Rect(0, H * 0.4f, W, 60), "YOU HAVE FALLEN", new GUIStyle(big) { fontSize = 40, alignment = TextAnchor.MiddleCenter });
+                GUI.color = old;
+            }
         }
+
+        void DrawIcon(Rect r, string name) { var t = UiArt.Tex(name); if (t != null) UiArt.Draw(r, t); }
 
         static ClassDef GameState_Class(string id)
         {
