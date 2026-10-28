@@ -1,0 +1,943 @@
+{
+ "unlockLevels": [
+  1,
+  3,
+  6,
+  10,
+  14,
+  18,
+  22,
+  26,
+  30,
+  34,
+  38,
+  42
+ ],
+ "upgradeLevelOffsets": [
+  8,
+  16
+ ],
+ "classes": [
+  {
+   "id": "warrior",
+   "name": "Warrior",
+   "color": "255,154,74",
+   "skills": [
+    {
+     "index": 1,
+     "name": "Power Strike",
+     "desc": "Lunge and cleave with a flaring crescent.",
+     "cooldown": 0.55,
+     "unlockLevel": 1,
+     "followUpDelay": 0.5,
+     "icon": "Art/Skills/warrior/skill_01",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Echo Blade",
+       "desc": "A spectral warrior repeats the cleave, far bigger.",
+       "unlockLevel": 9,
+       "icon": "Art/Upgrades/warrior/up_01"
+      },
+      {
+       "tier": 2,
+       "name": "Searing Brand",
+       "desc": "A burning sword sigil brands each target, then light erupts.",
+       "unlockLevel": 17,
+       "icon": "Art/Upgrades/warrior/up_02"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "name": "Shockwave",
+     "desc": "A ground wave that pierces everything.",
+     "cooldown": 1.4,
+     "unlockLevel": 3,
+     "followUpDelay": 0.9,
+     "icon": "Art/Skills/warrior/skill_02",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Fissure Run",
+       "desc": "A glowing lava crack races across the ground.",
+       "unlockLevel": 11,
+       "icon": "Art/Upgrades/warrior/up_03"
+      },
+      {
+       "tier": 2,
+       "name": "Boulder Burst",
+       "desc": "Rocks burst from the ground and rain back down.",
+       "unlockLevel": 19,
+       "icon": "Art/Upgrades/warrior/up_04"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "name": "War Cry",
+     "desc": "Golden shout. Attack aura for 12s.",
+     "cooldown": 2.2,
+     "unlockLevel": 6,
+     "followUpDelay": 0.3,
+     "icon": "Art/Skills/warrior/skill_03",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Battle Horn",
+       "desc": "A horn blast rolls out as ghost soldiers rally behind you.",
+       "unlockLevel": 14,
+       "icon": "Art/Upgrades/warrior/up_05"
+      },
+      {
+       "tier": 2,
+       "name": "Titan Wings",
+       "desc": "Colossal golden wings unfurl behind you.",
+       "unlockLevel": 22,
+       "icon": "Art/Upgrades/warrior/up_06"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "name": "Rage Slam",
+     "desc": "Leap and crush the ground.",
+     "cooldown": 2.4,
+     "unlockLevel": 10,
+     "followUpDelay": 0.8,
+     "icon": "Art/Skills/warrior/skill_04",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Stone Pillars",
+       "desc": "Rock pillars launch targets skyward, then slam them down.",
+       "unlockLevel": 18,
+       "icon": "Art/Upgrades/warrior/up_07"
+      },
+      {
+       "tier": 2,
+       "name": "Seismic Crack",
+       "desc": "The whole screen fractures, then shatters.",
+       "unlockLevel": 26,
+       "icon": "Art/Upgrades/warrior/up_08"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "name": "Whirlwind",
+     "desc": "Spin and slash everything around you.",
+     "cooldown": 1.8,
+     "unlockLevel": 14,
+     "followUpDelay": 1.6,
+     "icon": "Art/Skills/warrior/skill_05",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Fire Tornado",
+       "desc": "A blazing twister tears through the field.",
+       "unlockLevel": 22,
+       "icon": "Art/Upgrades/warrior/up_09"
+      },
+      {
+       "tier": 2,
+       "name": "Blade Vortex",
+       "desc": "Spectral swords orbit you, then spiral out to every target.",
+       "unlockLevel": 30,
+       "icon": "Art/Upgrades/warrior/up_10"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "name": "Cleaving Arc",
+     "desc": "A giant crescent flies across the field.",
+     "cooldown": 1.6,
+     "unlockLevel": 18,
+     "followUpDelay": 1,
+     "icon": "Art/Skills/warrior/skill_06",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Splitting Wave",
+       "desc": "The crescent splits into three.",
+       "unlockLevel": 26,
+       "icon": "Art/Upgrades/warrior/up_11"
+      },
+      {
+       "tier": 2,
+       "name": "Moon Slash",
+       "desc": "A full moon rises and a white stroke splits the sky.",
+       "unlockLevel": 34,
+       "icon": "Art/Upgrades/warrior/up_12"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "name": "Iron Bulwark",
+     "desc": "Golden plates shield you for 4s.",
+     "cooldown": 2.6,
+     "unlockLevel": 22,
+     "followUpDelay": 0.5,
+     "icon": "Art/Skills/warrior/skill_07",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Spiked Aegis",
+       "desc": "Golden spears burst out of your shield in every direction.",
+       "unlockLevel": 30,
+       "icon": "Art/Upgrades/warrior/up_13"
+      },
+      {
+       "tier": 2,
+       "name": "Guardian Spirit",
+       "desc": "A towering spectral knight raises his shield and bashes the field.",
+       "unlockLevel": 38,
+       "icon": "Art/Upgrades/warrior/up_14"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "name": "Blade Rain",
+     "desc": "Flaming swords fall from the sky.",
+     "cooldown": 2.2,
+     "unlockLevel": 26,
+     "followUpDelay": 1.4,
+     "icon": "Art/Skills/warrior/skill_08",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Sword Garden",
+       "desc": "Swords plant themselves in the ground, then detonate.",
+       "unlockLevel": 34,
+       "icon": "Art/Upgrades/warrior/up_15"
+      },
+      {
+       "tier": 2,
+       "name": "Sword Storm",
+       "desc": "Swords hover in a ring, then hammer down one after another.",
+       "unlockLevel": 42,
+       "icon": "Art/Upgrades/warrior/up_16"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "name": "Chain Pull",
+     "desc": "Chains drag every enemy to you.",
+     "cooldown": 2,
+     "unlockLevel": 30,
+     "followUpDelay": 0.9,
+     "icon": "Art/Skills/warrior/skill_09",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Chain Snare",
+       "desc": "Chains spiral tight around each target and slam them together.",
+       "unlockLevel": 38,
+       "icon": "Art/Upgrades/warrior/up_17"
+      },
+      {
+       "tier": 2,
+       "name": "Hook Reel",
+       "desc": "Giant chain hooks drop from the sky and haul everyone up.",
+       "unlockLevel": 46,
+       "icon": "Art/Upgrades/warrior/up_18"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "name": "Thunder Charge",
+     "desc": "Charge through them wreathed in lightning.",
+     "cooldown": 2.2,
+     "unlockLevel": 34,
+     "followUpDelay": 0.9,
+     "icon": "Art/Skills/warrior/skill_10",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Storm Cage",
+       "desc": "Bolts form a crackling cage around each target and crush in.",
+       "unlockLevel": 42,
+       "icon": "Art/Upgrades/warrior/up_19"
+      },
+      {
+       "tier": 2,
+       "name": "Thunder Hammer",
+       "desc": "A colossal lightning hammer falls from the clouds.",
+       "unlockLevel": 50,
+       "icon": "Art/Upgrades/warrior/up_20"
+      }
+     ]
+    },
+    {
+     "index": 11,
+     "name": "Blood Rage",
+     "desc": "Crimson aura boosts your attack.",
+     "cooldown": 3,
+     "unlockLevel": 38,
+     "followUpDelay": 0.8,
+     "icon": "Art/Skills/warrior/skill_11",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Crimson Wolf",
+       "desc": "A blood-red wolf spirit tears through everything.",
+       "unlockLevel": 46,
+       "icon": "Art/Upgrades/warrior/up_21"
+      },
+      {
+       "tier": 2,
+       "name": "Vampiric Mist",
+       "desc": "Blood mist is drained from every target into you.",
+       "unlockLevel": 54,
+       "icon": "Art/Upgrades/warrior/up_22"
+      }
+     ]
+    },
+    {
+     "index": 12,
+     "name": "Titan's Wrath",
+     "desc": "A colossal spectral blade crashes down.",
+     "cooldown": 3.4,
+     "unlockLevel": 42,
+     "followUpDelay": 1.4,
+     "icon": "Art/Skills/warrior/skill_12",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Titan Footstep",
+       "desc": "A giant foot stomps, sending a wave through the ground.",
+       "unlockLevel": 50,
+       "icon": "Art/Upgrades/warrior/up_23"
+      },
+      {
+       "tier": 2,
+       "name": "Sundered Sky",
+       "desc": "Golden lightning splits the sky; light pours down.",
+       "unlockLevel": 58,
+       "icon": "Art/Upgrades/warrior/up_24"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mage",
+   "name": "Mage",
+   "color": "106,184,255",
+   "skills": [
+    {
+     "index": 1,
+     "name": "Magic Claw",
+     "desc": "Two seeking bolts spiral in.",
+     "cooldown": 0.5,
+     "unlockLevel": 1,
+     "followUpDelay": 0.8,
+     "icon": "Art/Skills/mage/skill_01",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Arcane Constellation",
+       "desc": "Stars appear above the targets and link into a constellation.",
+       "unlockLevel": 9,
+       "icon": "Art/Upgrades/mage/up_01"
+      },
+      {
+       "tier": 2,
+       "name": "Seeking Butterflies",
+       "desc": "Glowing butterflies flutter out and burst on the targets.",
+       "unlockLevel": 17,
+       "icon": "Art/Upgrades/mage/up_02"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "name": "Fire Orb",
+     "desc": "Slow fireball that explodes.",
+     "cooldown": 1.4,
+     "unlockLevel": 3,
+     "followUpDelay": 1,
+     "icon": "Art/Skills/mage/skill_02",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Phoenix Rebirth",
+       "desc": "The fireball becomes a phoenix that loops and dives through the targets.",
+       "unlockLevel": 11,
+       "icon": "Art/Upgrades/mage/up_03"
+      },
+      {
+       "tier": 2,
+       "name": "Miniature Sun",
+       "desc": "A small sun swells, pulses three times, then collapses into a starburst.",
+       "unlockLevel": 19,
+       "icon": "Art/Upgrades/mage/up_04"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "name": "Barrier",
+     "desc": "A runed dome blocks every hit.",
+     "cooldown": 2.4,
+     "unlockLevel": 6,
+     "followUpDelay": 0.4,
+     "icon": "Art/Skills/mage/skill_03",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Mirror Reflect",
+       "desc": "Floating mirrors catch the glare and fire it back.",
+       "unlockLevel": 14,
+       "icon": "Art/Upgrades/mage/up_05"
+      },
+      {
+       "tier": 2,
+       "name": "Crystal Bloom",
+       "desc": "A crystal flower blossoms from the barrier, then shatters outward.",
+       "unlockLevel": 22,
+       "icon": "Art/Upgrades/mage/up_06"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "name": "Meteor",
+     "desc": "Five meteors rain from the sky.",
+     "cooldown": 2.6,
+     "unlockLevel": 10,
+     "followUpDelay": 1.6,
+     "icon": "Art/Skills/mage/skill_04",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Comet Shower",
+       "desc": "Long-tailed comets streak across the sky and land on the targets.",
+       "unlockLevel": 18,
+       "icon": "Art/Upgrades/mage/up_07"
+      },
+      {
+       "tier": 2,
+       "name": "Lava Craters",
+       "desc": "Impacts melt into bubbling lava pools that erupt.",
+       "unlockLevel": 26,
+       "icon": "Art/Upgrades/mage/up_08"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "name": "Ice Lance",
+     "desc": "A fast icicle pierces everything.",
+     "cooldown": 1.2,
+     "unlockLevel": 14,
+     "followUpDelay": 0.7,
+     "icon": "Art/Skills/mage/skill_05",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Frozen Spikes",
+       "desc": "A line of ice spikes erupts ahead, impaling everything.",
+       "unlockLevel": 22,
+       "icon": "Art/Upgrades/mage/up_09"
+      },
+      {
+       "tier": 2,
+       "name": "Snowflake Fractal",
+       "desc": "A huge snowflake draws itself on the ground, then blooms upward.",
+       "unlockLevel": 30,
+       "icon": "Art/Upgrades/mage/up_10"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "name": "Chain Lightning",
+     "desc": "Lightning leaps between enemies.",
+     "cooldown": 1.6,
+     "unlockLevel": 18,
+     "followUpDelay": 0.6,
+     "icon": "Art/Skills/mage/skill_06",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Tesla Web",
+       "desc": "Lightning spins a crackling web between every target.",
+       "unlockLevel": 26,
+       "icon": "Art/Upgrades/mage/up_11"
+      },
+      {
+       "tier": 2,
+       "name": "Sky Serpent",
+       "desc": "A dragon of lightning coils across the sky and breathes thunder.",
+       "unlockLevel": 34,
+       "icon": "Art/Upgrades/mage/up_12"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "name": "Frost Nova",
+     "desc": "A freezing ring locks enemies in ice.",
+     "cooldown": 2.4,
+     "unlockLevel": 22,
+     "followUpDelay": 0.6,
+     "icon": "Art/Skills/mage/skill_07",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Glacier Wall",
+       "desc": "A wall of towering ice spires rises, then bursts.",
+       "unlockLevel": 30,
+       "icon": "Art/Upgrades/mage/up_13"
+      },
+      {
+       "tier": 2,
+       "name": "Diamond Dust",
+       "desc": "A glittering cutting wind sweeps the field.",
+       "unlockLevel": 38,
+       "icon": "Art/Upgrades/mage/up_14"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "name": "Gravity Well",
+     "desc": "A black hole drags enemies in.",
+     "cooldown": 3,
+     "unlockLevel": 26,
+     "followUpDelay": 1.9,
+     "icon": "Art/Skills/mage/skill_08",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Satellite Orbit",
+       "desc": "Moons whirl around the singularity, then slingshot into the targets.",
+       "unlockLevel": 34,
+       "icon": "Art/Upgrades/mage/up_15"
+      },
+      {
+       "tier": 2,
+       "name": "Event Horizon",
+       "desc": "Starlight bends into a lensing ring, then everything snaps inward.",
+       "unlockLevel": 42,
+       "icon": "Art/Upgrades/mage/up_16"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "name": "Thunderstorm",
+     "desc": "Lightning strikes rain down.",
+     "cooldown": 3,
+     "unlockLevel": 30,
+     "followUpDelay": 2.2,
+     "icon": "Art/Skills/mage/skill_09",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Eye of the Storm",
+       "desc": "A dark thunderhead rolls in and hurls lightning from within.",
+       "unlockLevel": 38,
+       "icon": "Art/Upgrades/mage/up_17"
+      },
+      {
+       "tier": 2,
+       "name": "Ball Lightning",
+       "desc": "Three electric spheres roll and bounce across the ground.",
+       "unlockLevel": 46,
+       "icon": "Art/Upgrades/mage/up_18"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "name": "Blink",
+     "desc": "Teleport away and back with a trail.",
+     "cooldown": 2,
+     "unlockLevel": 34,
+     "followUpDelay": 1.2,
+     "icon": "Art/Skills/mage/skill_10",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Mirror Image",
+       "desc": "Three shimmering copies appear and fire together, then shatter.",
+       "unlockLevel": 42,
+       "icon": "Art/Upgrades/mage/up_19"
+      },
+      {
+       "tier": 2,
+       "name": "Portal Barrage",
+       "desc": "Portals tear open overhead and rain bolts down.",
+       "unlockLevel": 50,
+       "icon": "Art/Upgrades/mage/up_20"
+      }
+     ]
+    },
+    {
+     "index": 11,
+     "name": "Mana Surge",
+     "desc": "Orbiting orbs zap nearby enemies.",
+     "cooldown": 3,
+     "unlockLevel": 38,
+     "followUpDelay": 0.8,
+     "icon": "Art/Skills/mage/skill_11",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Halo of Runes",
+       "desc": "Three rune rings spin around you like a gyroscope, then slam outward.",
+       "unlockLevel": 46,
+       "icon": "Art/Upgrades/mage/up_21"
+      },
+      {
+       "tier": 2,
+       "name": "Overcharge",
+       "desc": "You glow white-hot and arc lightning in every direction.",
+       "unlockLevel": 54,
+       "icon": "Art/Upgrades/mage/up_22"
+      }
+     ]
+    },
+    {
+     "index": 12,
+     "name": "Arcane Cataclysm",
+     "desc": "A rune circle, a beam, a huge blast.",
+     "cooldown": 3.6,
+     "unlockLevel": 42,
+     "followUpDelay": 2.2,
+     "icon": "Art/Skills/mage/skill_12",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Planetary Alignment",
+       "desc": "Ringed planets slide into line overhead and fire down.",
+       "unlockLevel": 50,
+       "icon": "Art/Upgrades/mage/up_23"
+      },
+      {
+       "tier": 2,
+       "name": "Cosmic Rift",
+       "desc": "The sky tears open onto a starfield, and the void answers.",
+       "unlockLevel": 58,
+       "icon": "Art/Upgrades/mage/up_24"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rogue",
+   "name": "Rogue",
+   "color": "123,224,138",
+   "skills": [
+    {
+     "index": 1,
+     "name": "Double Throw",
+     "desc": "Three spinning stars.",
+     "cooldown": 0.45,
+     "unlockLevel": 1,
+     "followUpDelay": 0.7,
+     "icon": "Art/Skills/rogue/skill_01",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Boomerang Stars",
+       "desc": "Three stars curve out in wide arcs and fly back to your hand.",
+       "unlockLevel": 9,
+       "icon": "Art/Upgrades/rogue/up_01"
+      },
+      {
+       "tier": 2,
+       "name": "Confetti Burst",
+       "desc": "Stars pop overhead into a rain of razor confetti.",
+       "unlockLevel": 17,
+       "icon": "Art/Upgrades/rogue/up_02"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "name": "Dash Slash",
+     "desc": "Blink through them all.",
+     "cooldown": 1.4,
+     "unlockLevel": 3,
+     "followUpDelay": 0.7,
+     "icon": "Art/Skills/rogue/skill_02",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Frozen Frames",
+       "desc": "Time stalls while your dash replays in frozen frames, then all fire at once.",
+       "unlockLevel": 11,
+       "icon": "Art/Upgrades/rogue/up_03"
+      },
+      {
+       "tier": 2,
+       "name": "Crescent Trail",
+       "desc": "The dash leaves crescent trails that slice everything again.",
+       "unlockLevel": 19,
+       "icon": "Art/Upgrades/rogue/up_04"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "name": "Haste",
+     "desc": "Speed lines and afterimages.",
+     "cooldown": 2.2,
+     "unlockLevel": 6,
+     "followUpDelay": 0.4,
+     "icon": "Art/Skills/rogue/skill_03",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Time Ripples",
+       "desc": "Clock faces spin backward around you as time ripples.",
+       "unlockLevel": 14,
+       "icon": "Art/Upgrades/rogue/up_05"
+      },
+      {
+       "tier": 2,
+       "name": "Phantom Sprint",
+       "desc": "A stampede of phantoms sprints through the field.",
+       "unlockLevel": 22,
+       "icon": "Art/Upgrades/rogue/up_06"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "name": "Shadow Storm",
+     "desc": "A vortex of blades.",
+     "cooldown": 2.6,
+     "unlockLevel": 10,
+     "followUpDelay": 0.9,
+     "icon": "Art/Skills/rogue/skill_04",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Shadow Hands",
+       "desc": "Hands of shadow claw out of the ground and crush each target.",
+       "unlockLevel": 18,
+       "icon": "Art/Upgrades/rogue/up_07"
+      },
+      {
+       "tier": 2,
+       "name": "Black Hole Blades",
+       "desc": "Blades are dragged across the screen into a tiny black hole that bursts.",
+       "unlockLevel": 26,
+       "icon": "Art/Upgrades/rogue/up_08"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "name": "Venom Cloud",
+     "desc": "Throw a vial that leaves a toxic cloud.",
+     "cooldown": 2,
+     "unlockLevel": 14,
+     "followUpDelay": 0.9,
+     "icon": "Art/Skills/rogue/skill_05",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Thorn Vines",
+       "desc": "Thorned vines whip up from the ground and coil around each target.",
+       "unlockLevel": 22,
+       "icon": "Art/Upgrades/rogue/up_09"
+      },
+      {
+       "tier": 2,
+       "name": "Toxic Bloom",
+       "desc": "A giant poison flower blooms and bursts into spores.",
+       "unlockLevel": 30,
+       "icon": "Art/Upgrades/rogue/up_10"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "name": "Shadow Clone",
+     "desc": "Clones flicker in and slash everyone.",
+     "cooldown": 2.2,
+     "unlockLevel": 18,
+     "followUpDelay": 0.8,
+     "icon": "Art/Skills/rogue/skill_06",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Ink Clones",
+       "desc": "Clones appear beside each target and burst into ink.",
+       "unlockLevel": 26,
+       "icon": "Art/Upgrades/rogue/up_11"
+      },
+      {
+       "tier": 2,
+       "name": "Kaleidoscope",
+       "desc": "Slashes mirror into a spinning eight-fold mandala.",
+       "unlockLevel": 34,
+       "icon": "Art/Upgrades/rogue/up_12"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "name": "Smoke Bomb",
+     "desc": "Vanish in smoke, reappear in style.",
+     "cooldown": 2.4,
+     "unlockLevel": 22,
+     "followUpDelay": 1,
+     "icon": "Art/Skills/rogue/skill_07",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Smoke Serpent",
+       "desc": "A serpent of smoke winds through the targets with burning eyes.",
+       "unlockLevel": 30,
+       "icon": "Art/Upgrades/rogue/up_13"
+      },
+      {
+       "tier": 2,
+       "name": "Raven Murder",
+       "desc": "Ravens burst from the smoke, circle the targets, then dive.",
+       "unlockLevel": 38,
+       "icon": "Art/Upgrades/rogue/up_14"
+      }
+     ]
+    },
+    {
+     "index": 8,
+     "name": "Blade Fan",
+     "desc": "Seven knives fan out.",
+     "cooldown": 1.4,
+     "unlockLevel": 26,
+     "followUpDelay": 0.8,
+     "icon": "Art/Skills/rogue/skill_08",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Feather Fan",
+       "desc": "A peacock fan of blade-feathers opens, then flies out in a spinning flock.",
+       "unlockLevel": 34,
+       "icon": "Art/Upgrades/rogue/up_15"
+      },
+      {
+       "tier": 2,
+       "name": "Pin Cushion",
+       "desc": "Knives stick in every target, then detonate one by one.",
+       "unlockLevel": 42,
+       "icon": "Art/Upgrades/rogue/up_16"
+      }
+     ]
+    },
+    {
+     "index": 9,
+     "name": "Backstab Combo",
+     "desc": "Teleport behind each target.",
+     "cooldown": 2.4,
+     "unlockLevel": 30,
+     "followUpDelay": 1.5,
+     "icon": "Art/Skills/rogue/skill_09",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Combo Counter",
+       "desc": "Every hit rings up a growing combo, ending in a brush-stroke finish.",
+       "unlockLevel": 38,
+       "icon": "Art/Upgrades/rogue/up_17"
+      },
+      {
+       "tier": 2,
+       "name": "Rift Steps",
+       "desc": "Dark rifts open at each target and you flicker through them, slashing.",
+       "unlockLevel": 46,
+       "icon": "Art/Upgrades/rogue/up_18"
+      }
+     ]
+    },
+    {
+     "index": 10,
+     "name": "Explosive Trap",
+     "desc": "A mine that blows up big.",
+     "cooldown": 2.6,
+     "unlockLevel": 34,
+     "followUpDelay": 1.4,
+     "icon": "Art/Skills/rogue/skill_10",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Fireworks",
+       "desc": "The blast launches rockets that burst into stars, rings and hearts.",
+       "unlockLevel": 42,
+       "icon": "Art/Upgrades/rogue/up_19"
+      },
+      {
+       "tier": 2,
+       "name": "Chain Mines",
+       "desc": "Hidden mines blink red, then chain-detonate across the field.",
+       "unlockLevel": 50,
+       "icon": "Art/Upgrades/rogue/up_20"
+      }
+     ]
+    },
+    {
+     "index": 11,
+     "name": "Phantom Barrage",
+     "desc": "A flurry of afterimage slashes.",
+     "cooldown": 3,
+     "unlockLevel": 38,
+     "followUpDelay": 1.7,
+     "icon": "Art/Skills/rogue/skill_11",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Ghost Army",
+       "desc": "A rank of ghost rogues charges across the field.",
+       "unlockLevel": 46,
+       "icon": "Art/Upgrades/rogue/up_21"
+      },
+      {
+       "tier": 2,
+       "name": "Stopped Clock",
+       "desc": "A giant clock stops overhead; frozen knives hang around each target, then drop.",
+       "unlockLevel": 54,
+       "icon": "Art/Upgrades/rogue/up_22"
+      }
+     ]
+    },
+    {
+     "index": 12,
+     "name": "Assassinate",
+     "desc": "One frozen frame, then every enemy is cut.",
+     "cooldown": 3.6,
+     "unlockLevel": 42,
+     "followUpDelay": 1.5,
+     "icon": "Art/Skills/rogue/skill_12",
+     "upgrades": [
+      {
+       "tier": 1,
+       "name": "Death Mark",
+       "desc": "A crimson sigil and a countdown hang over each target, then execute.",
+       "unlockLevel": 50,
+       "icon": "Art/Upgrades/rogue/up_23"
+      },
+      {
+       "tier": 2,
+       "name": "Final Curtain",
+       "desc": "Letterbox bars slide in, red curtains close, and the finale lands.",
+       "unlockLevel": 58,
+       "icon": "Art/Upgrades/rogue/up_24"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

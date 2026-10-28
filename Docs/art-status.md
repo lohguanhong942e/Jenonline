@@ -14,3 +14,9 @@ Credits left: 16 of 40.
 
 ## Not started
 Rogue (male and female), Warrior female, Mage male, character animations, tilesets, more backdrops (hall, library, chapel, catacomb, under, armory, tower, throne).
+
+## Skill art (Canva, added)
+- Skill icons: Assets/Resources/Art/Skills/{warrior,mage,rogue}/skill_01..12.png (256 px, round).
+- Upgrade icons: Assets/Resources/Art/Upgrades/{warrior,mage,rogue}/up_01..24.png (190 px, round). Upgrade n of skill i is up_(2*i+n) with i from 0.
+- Names, descriptions, unlock levels and icon paths: Assets/Resources/Data/skills.json.
+- Effect designs live in the browser Skill Lab and are the reference for the Unity VFX port.
