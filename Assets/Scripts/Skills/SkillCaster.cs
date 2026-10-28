@@ -129,6 +129,7 @@ namespace Vesperhold
             Player.Mp -= cost; cd[i] = cdMax[i] = def.cooldown * 1.6f;     // slightly longer than the lab so MP and cooldown both matter
             var c = new SkillCtx(this);
             FloatingText.Spawn(Player.transform.position + Vector3.up * 2.1f, def.name, Vfx.C(ColorKey));
+            Sfx.Play(ClassId == "warrior" ? "cast_fire" : ClassId == "rogue" ? "cast_shadow" : i % 3 == 0 ? "cast_ice" : i % 3 == 1 ? "cast_bolt" : "cast_holy", 0.7f, UnityEngine.Random.Range(0.95f, 1.05f));
             skills[i](c);
             for (int k = 0; k < 2; k++)
             {
@@ -245,6 +246,7 @@ namespace Vesperhold
                 }
                 GUI.color = Color.white;
                 GUI.Label(new Rect(r.x + 3, r.y + 1, 20, 16), KeyLabels[i], small);
+                if (GUI.Button(r, GUIContent.none, GUIStyle.none)) Cast(i);
                 if (!on) GUI.Label(r, "Lv" + def.unlockLevel, mid);
                 else
                 {

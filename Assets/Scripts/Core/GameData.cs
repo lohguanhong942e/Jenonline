@@ -101,7 +101,8 @@ namespace Vesperhold
         public static RoomData Room(string id) { Load(); return roomById[id]; }
         public static EnemyDef Enemy(string id) { Load(); return enemyById[id]; }
 
-        public static int XpToLevel(int level) { return level * 40; }
+        // Gentler than the web build (level * 40) because the 12 skills unlock up to level 42.
+        public static int XpToLevel(int level) { return 20 + level * 9; }
     }
 
     public static class Tuning
@@ -119,6 +120,7 @@ namespace Vesperhold
         public const float Coyote = 0.1f;
         public const float JumpBuffer = 0.12f;
         public const float Invulnerable = 1.1f;
+        public const float MpRegenBase = 2.0f, MpRegenPerInt = 0.2f, MpRegenPerLevel = 0.06f;     // mana per second
         public const float EliteHp = 2.4f, EliteDamage = 1.5f, EliteGold = 2.5f, EliteXp = 2.6f;
     }
 }

@@ -14,6 +14,8 @@ namespace Vesperhold
         Camera cam; Transform world; PlayerController player;
         float shake, hitStop; bool changing; bool showMenu = true, showWin, pickClass;
         public bool InMenu { get { return showMenu; } }
+        public bool InRun { get { return !showMenu && !showWin && player != null; } }
+        public void SetPaused(bool p) { Paused = p; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot()
@@ -34,6 +36,8 @@ namespace Vesperhold
             if (cam == null) { var cg = new GameObject("Main Camera") { tag = "MainCamera" }; cam = cg.AddComponent<Camera>(); }
             cam.orthographic = true; cam.orthographicSize = 7f; cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = Color.black;
             cam.transform.position = new Vector3(0, 0, -10);
+            PostFx.Setup(cam);
+            gameObject.AddComponent<MenuUI>(); gameObject.AddComponent<TouchControls>();
             world = new GameObject("World").transform;
             Paused = true;
         }
@@ -52,7 +56,7 @@ namespace Vesperhold
 
         IEnumerator Change(string roomId, string doorId)
         {
-            changing = true; Paused = true;
+            changing = true; Paused = true; Sfx.Play("door", 0.6f);
             yield return null;
             LoadRoom(roomId, doorId, null, false);
             yield return null;
@@ -93,9 +97,11 @@ namespace Vesperhold
         {
             if (toastT > 0) toastT -= Time.unscaledDeltaTime;
             if (hitStop > 0) { hitStop -= Time.unscaledDeltaTime; Time.timeScale = hitStop > 0 ? 0.05f : 1f; }
-            var kb = Keyboard.current;
-            if (kb != null && !showMenu && kb.escapeKey.wasPressedThisFrame) Paused = !Paused;
+            Sfx.MusicTick(InRun, BossBrain.Current != null);
         }
+
+        // Back to the title screen from the pause menu (progress was saved when the menu closed).
+        public void QuitToTitle() { ReturnToTitle(); }
 
         public void Toast(string s) { ToastText = s; toastT = 2.5f; }
         public void Shake(float s) { shake = s; }
@@ -178,7 +184,6 @@ namespace Vesperhold
                 Bar(new Rect(Screen.width / 2f - bwid / 2f, 70, bwid, 12), Mathf.Max(0, boss.E.Hp) / (float)boss.E.MaxHp, new Color(0.85f, 0.25f, 0.2f), "");
             }
             if (toastT > 0) GUI.Label(new Rect(0, 60, Screen.width, 40), ToastText, new GUIStyle(big) { alignment = TextAnchor.MiddleCenter });
-            if (Paused && !changing) GUI.Label(new Rect(0, Screen.height / 2 - 30, Screen.width, 60), "Paused (Esc)", new GUIStyle(big) { fontSize = 40, alignment = TextAnchor.MiddleCenter });
         }
 
         static ClassDef GameState_Class(string id)

@@ -33,6 +33,7 @@ namespace Vesperhold
             BuildDoors();
             BuildEntities();
             BuildGate();
+            Lighting.Global(transform, Mathf.Lerp(1f, 0.42f, Data.dark), Color.Lerp(Color.white, palette.Platform, 0.3f));
         }
 
         void BuildBackdrop(Palette p)
@@ -44,6 +45,7 @@ namespace Vesperhold
             // Optional painted backdrop: drop a PNG named after the room theme (gate, hall, library, ...)
             // into Assets/Resources/Art/Backdrops/. Falls back to a flat colour.
             var tex = Resources.Load<Texture2D>("Art/Backdrops/" + Data.theme);
+            if (tex == null) tex = TileArt.Backdrop(Data.theme);
             if (tex != null)
             {
                 sr.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), tex.height / (float)(Data.h + 2));
@@ -62,15 +64,14 @@ namespace Vesperhold
             var oneWay = MakeLayer("OneWay", true, p.Platform);
             var hazard = MakeLayer("Hazard", false, p.Spike);
             hazard.GetComponent<TilemapCollider2D>().isTrigger = true;
-            var solidTile = SpriteFactory.MakeTile(p.Solid);
-            var platTile = SpriteFactory.MakeTile(p.Platform);
-            var spikeTile = SpriteFactory.MakeTile(p.Spike);
+            var platTile = TileArt.Platform(Data.theme);
+            var spikeTile = TileArt.Spike(Data.theme);
             for (int r = 0; r < Data.h; r++)
             for (int c = 0; c < Data.w; c++)
             {
                 int t = Data.At(c, r);
                 var cell = new Vector3Int(c, -r - 1, 0);
-                if (t == Tiles.Solid) solid.SetTile(cell, solidTile);
+                if (t == Tiles.Solid) solid.SetTile(cell, TileArt.Solid(Data.theme, (int)((c * 7 + r * 13) % 4), Data.At(c, r - 1) != Tiles.Solid));
                 else if (t == Tiles.OneWay) oneWay.SetTile(cell, platTile);
                 else if (t == Tiles.Spike)
                 {

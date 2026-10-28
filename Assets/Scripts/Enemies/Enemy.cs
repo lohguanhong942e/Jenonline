@@ -97,16 +97,17 @@ namespace Vesperhold
                 || edge.collider == null) dir = -dir;
         }
 
-        public void TakeDamage(int dm, int knockDir, int combo)
+        public void TakeDamage(int dm, int knockDir, int combo, bool crit = false)
         {
             if (dead || Invulnerable) return;
-            Hp -= dm; hurtT = 0.12f;
+            Hp -= dm; hurtT = 0.12f; Sfx.Play("hit", 0.55f, Random.Range(0.9f, 1.15f));
+            Vfx.Burst(Mid, crit ? 2.6f : 1.4f, crit ? "y" : "o", 0.2f);
             if (!IsBoss)
             {
                 float kb = (Type == "armor" ? 40f : 100f) / 16f * (combo == 2 ? 1.9f : 1f);
                 rb.linearVelocity = new Vector2(knockDir * kb, Type == "skeleton" ? 3.75f : 0f);
             }
-            FloatingText.Spawn(transform.position + Vector3.up * (IsBoss ? 3.2f : 1.3f), dm.ToString(), Color.white);
+            FloatingText.Spawn(transform.position + Vector3.up * (IsBoss ? 3.2f : 1.3f), crit ? dm + "!" : dm.ToString(), crit ? new Color(1f, 0.85f, 0.3f) : Color.white);
             if (Hp <= 0) Die();
         }
 
@@ -124,27 +125,38 @@ namespace Vesperhold
         {
             if (dead) return; dead = true;
             int gold = Mathf.RoundToInt(Random.Range(def.goldMin, def.goldMax + 1) * GoldMul);
-            GameState.Gold += gold;
-            if (Random.value < 0.4f) GameState.Hearts = Mathf.Min(99, GameState.Hearts + 1);
-            if (GameState.AddXp(Mathf.RoundToInt(def.xp * XpMul))) GameManager.Instance.Toast("Level " + GameState.Level + "! +5 stat points");
-            LootTable.RollSword(Type);
+            Vector2 at = Mid;
+            int coins = IsBoss ? 10 : Mathf.Clamp(gold / 3, 1, 5);
+            for (int i = 0; i < coins; i++) Pickup.Spawn(at, "coin", i == coins - 1 ? gold - (gold / coins) * (coins - 1) : gold / coins);
+            if (Random.value < 0.4f) Pickup.Spawn(at, "heart", 1);
+            if (Random.value < 0.08f || IsBoss) Pickup.Spawn(at, "potion", 1);
+            if (GameState.AddXp(Mathf.RoundToInt(def.xp * XpMul))) { GameManager.Instance.Toast("Level " + GameState.Level + "! +5 stat points"); Sfx.Play("level"); Vfx.Ring(PlayerController.Instance.transform.position, 4f, "y", 0.6f); }
+            LootTable.Roll(Type, DamageMul > 1f);
+            Vfx.Burst(at, IsBoss ? 7f : 2.6f, "w", 0.4f); Vfx.Sparks(at, IsBoss ? 24 : 9, 5f, "burst_o", null, 0.35f, 0.6f, 8f);
+            Sfx.Play(IsBoss ? "explode" : "hit", 0.8f, IsBoss ? 0.8f : 0.7f);
             OnDeath?.Invoke(this);
             Destroy(gameObject);
         }
     }
 
-    // Sword drops from the web build: skeleton/ghost/bat/armor each have a signature blade.
+    // Gear drops: any enemy can drop a weapon for your class or a piece of armor near your level.
+    // Elites and bosses drop more, so the whole 30-tier ladder is reachable by playing.
     public static class LootTable
     {
-        public static void RollSword(string enemy)
+        public static void Roll(string enemy, bool elite)
         {
-            int idx = -1; float chance = 0.05f;
-            if (enemy == "skeleton") idx = 3; else if (enemy == "ghost") idx = 4; else if (enemy == "bat") idx = 5;
-            else if (enemy == "armor") { idx = Random.value < 0.5f ? 6 : 7; chance = 0.04f; }
-            if (idx >= 0 && !GameState.OwnedSwords[idx] && Random.value < chance)
+            bool boss = enemy == "boss" || enemy == "lord";
+            float k = boss ? 1f : elite ? 2.5f : 1f;
+            int around = GameState.Level * 3 / 5 + (boss ? 3 : 0);
+            if (boss || Random.value < 0.05f * k)
             {
-                GameState.OwnedSwords[idx] = true;
-                GameManager.Instance.Toast("Found " + GameData.Swords.swords[idx].n + "!");
+                var w = ItemDb.Weapon(GameState.Kind, Mathf.Clamp(around + Random.Range(-1, 3), 2, 30));
+                if (GameState.Give(w)) { GameManager.Instance.Toast("Found " + w.Name + "!"); Sfx.Play("pickup"); }
+            }
+            if (boss || Random.value < 0.03f * k)
+            {
+                var a = ItemDb.Armor(Mathf.Clamp(around * 32 / 30 + Random.Range(-1, 3), 1, 32));
+                if (GameState.Give(a)) { GameManager.Instance.Toast("Found " + a.Name + "!"); Sfx.Play("pickup"); }
             }
         }
     }

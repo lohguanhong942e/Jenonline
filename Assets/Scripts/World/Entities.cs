@@ -82,7 +82,7 @@ namespace Vesperhold
             GameState.SaveX = transform.position.x; GameState.SaveY = transform.position.y;
             GameState.Potions = Mathf.Max(GameState.Potions, 2);
             p.FullRestore();
-            GameState.Save();
+            GameState.Save(); Sfx.Play("level", 0.6f, 1.2f); Vfx.Pillar(transform.position, 3f, "pillar_fire", 0.6f, 1.2f);
             GameManager.Instance.Toast("Brazier lit. Progress saved.");
         }
     }
@@ -109,21 +109,22 @@ namespace Vesperhold
         public override void Use(PlayerController p)
         {
             if (GameState.Opened.Contains(e.id)) return;
-            GameState.Opened.Add(e.id); sr.color = new Color(0.3f, 0.22f, 0.1f);
+            GameState.Opened.Add(e.id); sr.color = new Color(0.3f, 0.22f, 0.1f); Sfx.Play("pickup"); Vfx.Burst(transform.position + Vector3.up * 0.5f, 2.4f, "y", 0.4f);
             var parts = new List<string>();
             if (e.gold > 0) { GameState.Gold += e.gold; parts.Add(e.gold + " gold"); }
             if (e.pots > 0) { GameState.Potions = Mathf.Min(9, GameState.Potions + e.pots); parts.Add(e.pots + " potions"); }
             switch (e.item)
             {
-                case "dagger": parts.Add("a Throwing Dagger"); break;
-                case "axe": parts.Add("a Silver Axe"); break;
+                case "dagger": GameState.Potions = Mathf.Min(9, GameState.Potions + 1); parts.Add("a potion (dagger)"); break;
+                case "axe": GameState.Gold += 60; parts.Add("60 gold (axe)"); break;
                 case "key": GameState.Flags.Add("key"); parts.Add("the Sovereign Key"); GameManager.Instance.CurrentRoom.OpenGate(); break;
-                case "armor1": GameState.Armor = Mathf.Max(GameState.Armor, 1); parts.Add("a Chain Coat"); break;
+                case "armor1": { var a = ItemDb.Armor(5); GameState.Give(a); parts.Add(a.Name); break; }
                 case "hpup": GameState.HpUps++; p.FullRestore(); parts.Add("a Heart Vessel"); break;
                 default:
                     if (!string.IsNullOrEmpty(e.item) && e.item.StartsWith("sword"))
                     {
-                        int i = int.Parse(e.item.Substring(5)); GameState.OwnedSwords[i] = true; parts.Add(GameData.Swords.swords[i].n);
+                        var w = ItemDb.Weapon(GameState.Kind, ItemDb.FromWebSword(int.Parse(e.item.Substring(5))));
+                        GameState.Give(w); parts.Add(w.Name);
                     }
                     break;
             }
@@ -161,7 +162,11 @@ namespace Vesperhold
     {
         RoomEnt e;
         public void Setup(RoomEnt ent) { e = ent; }
-        public override void Use(PlayerController p) { GameManager.Instance.Toast(e.name + ": " + Hint()); }
+        public override void Use(PlayerController p)
+        {
+            if (e.talk == "mirelda" || e.talk == "borin") { MenuUI.Instance.OpenShop(e.talk, e.name); return; }
+            GameManager.Instance.Toast(e.name + ": " + Hint());
+        }
 
         static string Hint()
         {

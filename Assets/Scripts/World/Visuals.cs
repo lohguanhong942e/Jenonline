@@ -92,6 +92,7 @@ namespace Vesperhold
     public class TorchLight : MonoBehaviour
     {
         SpriteRenderer sr; float seed;
+        UnityEngine.Rendering.Universal.Light2D lamp;
         void Start()
         {
             seed = Random.value * 10f;
@@ -99,11 +100,13 @@ namespace Vesperhold
             sr.sprite = SpriteFactory.Square;
             sr.sortingOrder = -50;
             transform.localScale = new Vector3(0.35f, 0.6f, 1);
+            lamp = Lighting.Point(transform, Vector3.zero, 8f, new Color(1f, 0.62f, 0.3f), 1.2f);
         }
         void Update()
         {
             float f = 0.75f + 0.25f * Mathf.PerlinNoise(Time.time * 6f, seed);
             sr.color = new Color(1f, 0.55f * f + 0.2f, 0.15f, 0.9f);
+            if (lamp != null) lamp.intensity = 0.9f + 0.5f * f;
         }
     }
 
