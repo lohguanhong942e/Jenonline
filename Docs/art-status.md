@@ -20,3 +20,9 @@ Rogue (male and female), Warrior female, Mage male, character animations, tilese
 - Upgrade icons: Assets/Resources/Art/Upgrades/{warrior,mage,rogue}/up_01..24.png (190 px, round). Upgrade n of skill i is up_(2*i+n) with i from 0.
 - Names, descriptions, unlock levels and icon paths: Assets/Resources/Data/skills.json.
 - Effect designs live in the browser Skill Lab and are the reference for the Unity VFX port.
+
+## Added in the polish pass
+- Characters: warrior_male (cute), mage_female, rogue_male in Assets/Resources/Art/Characters.
+- Backdrops (1280x720 JPG, Canva): gate, hall, library, chapel, catacomb, under, armory, tower, throne in Assets/Resources/Art/Backdrops. All nine themes now have painted backdrops.
+- Tiles are generated in code (World/TileArt.cs); painted tiles could replace them later.
+- Still missing: female warrior, male mage, female rogue, real animation frames.

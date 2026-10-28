@@ -36,4 +36,4 @@ It creates the empty start scene, sets Brotli with the decompression fallback, h
 - None of this has been play-tested: expect to retune after the first run.
 
 ## Still not done
-Real character animation frames, rogue art, painted backdrops and tiles for all rooms, music and sound files made by a person.
+Real character animation frames, other gender variants, painted tiles, music and sound files made by a person.

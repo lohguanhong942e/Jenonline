@@ -55,8 +55,8 @@ namespace Vesperhold
         // Swap the placeholder box for the class portrait (Art/Characters). Pixel art, feet at the pivot.
         public void ApplyClassArt(string classId)
         {
-            string file = classId == "mage" ? "mage_female" : classId == "warrior" ? "warrior_male" : null;
-            var spr = file == null ? null : SpriteFactory.LoadSprite("Art/Characters/" + file, 1.6f, true);
+            string file = classId == "mage" ? "mage_female" : classId == "warrior" ? "warrior_male" : "rogue_male";
+            var spr = SpriteFactory.LoadSprite("Art/Characters/" + file, 1.6f, classId != "rogue");   // rogue art is smoother, so no point filtering
             if (spr == null) return;
             body.sprite = spr; body.transform.localPosition = Vector3.zero; bodyBaseY = 0f;
             bodyScale = Vector3.one; bodyColor = Color.white;
