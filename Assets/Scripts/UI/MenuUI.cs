@@ -28,7 +28,7 @@ namespace Vesperhold
 
         void DrawOverlays()
         {
-            float W = Screen.width, H = Screen.height;
+            float W = UiScale.W, H = UiScale.H;
             if (dlgT > 0)
             {
                 float w = Mathf.Min(W - 30, 760), h = 150, x = (W - w) / 2f, y = H - 270;
@@ -53,6 +53,8 @@ namespace Vesperhold
                 GUI.color = Color.white;
             }
         }
+
+        public void OpenPause() { if (!Open) { shopMode = false; tab = Tab.Options; SetOpen(true); } }
 
         public void OpenShop(string id, string name)
         {
@@ -102,13 +104,15 @@ namespace Vesperhold
             tabBtn = UiArt.Button(15);
         }
 
-        void OnGUI()
+        void OnGUI() { UiScale.Begin(); Draw(); UiScale.End(); }
+
+        void Draw()
         {
             Styles();
             if (GameManager.Instance != null && GameManager.Instance.InRun) DrawOverlays();
             if (!Open) return;
-            float w = Mathf.Min(Screen.width - 24, 900), h = Mathf.Min(Screen.height - 24, 580);
-            var win = new Rect((Screen.width - w) / 2f, (Screen.height - h) / 2f, w, h);
+            float w = Mathf.Min(UiScale.W - 24, 900), h = Mathf.Min(UiScale.H - 24, 580);
+            var win = new Rect((UiScale.W - w) / 2f, (UiScale.H - h) / 2f, w, h);
             GUI.color = new Color(0.04f, 0.03f, 0.08f, 0.97f); GUI.DrawTexture(win, Texture2D.whiteTexture); GUI.color = Color.white;
             if (!UiArt.Stretch(new Rect(win.x - 8, win.y - 8, win.width + 16, win.height + 16), UiArt.Tex("panel_frame")))
             { GUI.color = new Color(0.8f, 0.65f, 0.3f); GUI.DrawTexture(new Rect(win.x, win.y, win.width, 2), Texture2D.whiteTexture); GUI.color = Color.white; }
@@ -225,6 +229,7 @@ namespace Vesperhold
             var cls = SkillCatalog.Get(GameState.ClassId);
             GUI.Label(new Rect(r.x, r.y, r.width, 28), cls.name + " skills", title);
             var view = new Rect(r.x, r.y + 32, r.width, r.height - 36);
+            UiScale.DragScroll(view, ref scroll);
             scroll = GUI.BeginScrollView(view, scroll, new Rect(0, 0, view.width - 20, cls.skills.Length * 84));
             for (int i = 0; i < cls.skills.Length; i++)
             {
@@ -273,7 +278,9 @@ namespace Vesperhold
             GUI.Label(new Rect(r.x, y, 160, 24), "Sound effects", body); Sfx.Volume = GUI.HorizontalSlider(new Rect(r.x + 170, y + 6, 240, 20), Sfx.Volume, 0f, 1f); y += 34;
             GUI.Label(new Rect(r.x, y, 160, 24), "Music", body); Sfx.MusicVolume = GUI.HorizontalSlider(new Rect(r.x + 170, y + 6, 240, 20), Sfx.MusicVolume, 0f, 0.6f); y += 34;
             Sfx.Muted = GUI.Toggle(new Rect(r.x, y, 300, 26), Sfx.Muted, " Mute everything"); y += 32;
-            TouchInput.Force = GUI.Toggle(new Rect(r.x, y, 360, 26), TouchInput.Force, " Show touch controls (phones show them automatically)"); y += 44;
+            TouchInput.Force = GUI.Toggle(new Rect(r.x, y, 360, 26), TouchInput.Force, " Show touch controls (phones show them automatically)"); y += 32;
+            Haptics.On = GUI.Toggle(new Rect(r.x, y, 300, 26), Haptics.On, " Vibration"); y += 32;
+            Perf.BatterySaver = GUI.Toggle(new Rect(r.x, y, 360, 26), Perf.BatterySaver, " Battery saver (30 fps)"); y += 44;
             if (GUI.Button(new Rect(r.x, y, 160, 38), "Resume", btn)) SetOpen(false);
             if (GUI.Button(new Rect(r.x + 170, y, 160, 38), "Save game", btn)) { GameState.Save(); Note("Game saved."); }
             if (GUI.Button(new Rect(r.x + 340, y, 160, 38), "Quit to title", btn)) { SetOpen(false); GameManager.Instance.QuitToTitle(); }
@@ -295,6 +302,7 @@ namespace Vesperhold
             int alo = mirelda ? 1 : 6, ahi = mirelda ? 8 : 18;
             foreach (var a in ItemDb.Armors()) if (a.Tier >= alo && a.Tier <= ahi) list.Add(a);
             var view = new Rect(win.x + 16, win.y + 72, win.width - 32, win.height - 130);
+            UiScale.DragScroll(view, ref scroll2);
             scroll2 = GUI.BeginScrollView(view, scroll2, new Rect(0, 0, view.width - 20, 52 + list.Count * 46));
             // potion row
             GUI.Label(new Rect(4, 8, 360, 30), "Healing Potion  (restores 20 HP)   25 gold   you have " + GameState.Potions, body);

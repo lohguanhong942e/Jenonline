@@ -40,18 +40,30 @@ namespace Vesperhold
             src.PlayOneShot(c, vol * Volume);
         }
 
+        // The loops are rendered a slice per frame so a phone never freezes while they are built.
+        class Runner : MonoBehaviour { }
+        static Runner runner; static bool building;
+
         // Call every frame: plays the exploration loop, or the boss loop while a boss is alive.
         public static void MusicTick(bool inGame, bool boss)
         {
             Ensure();
             musicSrc.volume = Muted ? 0f : MusicVolume;
             if (!inGame) boss = false;
+            if (explore == null) { if (!building && inGame) Build(false); return; }
+            if (bossLoop == null && !building) Build(true);          // build the boss loop quietly in the background
+            if (boss && bossLoop == null) boss = false;
             if (!musicSrc.isPlaying || boss != bossPlaying)
             {
-                if (explore == null) explore = Loop(false);
-                if (bossLoop == null) bossLoop = Loop(true);
                 bossPlaying = boss; musicSrc.clip = boss ? bossLoop : explore; musicSrc.Play();
             }
+        }
+
+        static void Build(bool boss)
+        {
+            building = true;
+            if (runner == null) runner = src.gameObject.AddComponent<Runner>();
+            runner.StartCoroutine(RenderLoop(boss));
         }
 
         // ---- synthesis helpers ----
@@ -99,7 +111,7 @@ namespace Vesperhold
         }
 
         // ---- music: a small synthesised loop (pad + bass + arpeggio, with drums for the boss) ----
-        static AudioClip Loop(bool boss)
+        static System.Collections.IEnumerator RenderLoop(bool boss)
         {
             float bpm = boss ? 132f : 84f, beat = 60f / bpm; int bars = 8;
             float total = bars * 4 * beat; int n = Mathf.CeilToInt(total * SR); var d = new float[n];
@@ -109,23 +121,30 @@ namespace Vesperhold
             float lp = 0f;
             var fr = new float[4][];
             for (int c = 0; c < 4; c++) { fr[c] = new float[5]; for (int k = 0; k < 4; k++) fr[c][k] = Hz(prog[c][k]); fr[c][4] = Hz(prog[c][0] - 12); }
-            for (int i = 0; i < n; i++)
+            const int Slice = 24000;
+            for (int i0 = 0; i0 < n; i0 += Slice)
             {
-                float t = i / (float)SR; int bar = (int)(t / (4 * beat)); var f = fr[bar % 4];
-                float inBar = t - bar * 4 * beat; int step = (int)(inBar / (beat * 0.5f)); float st = inBar - step * beat * 0.5f;
-                float s = 0f;
-                for (int k = 1; k < 4; k++) s += (Sine(f[k], t) + 0.5f * Sine(f[k] * 1.004f, t)) * 0.05f;                         // pad
-                float bt = inBar % beat; s += (boss ? Saw(f[4], t) * 0.16f : Sine(f[4], t) * 0.3f) * Mathf.Exp(-bt * (boss ? 6f : 3f));   // bass
-                s += Tri(f[1 + step % 3] * 2f, t) * Mathf.Exp(-st * 9f) * (boss ? 0.1f : 0.07f);                                  // arpeggio
-                if (boss)
+                int i1 = Mathf.Min(n, i0 + Slice);
+                for (int i = i0; i < i1; i++)
                 {
-                    s += Sine(60f - bt * 60f, t) * Mathf.Exp(-bt * 14f) * 0.5f;                                                      // kick
-                    if ((int)(inBar / beat) % 2 == 1) { lp += (Noise() - lp) * 0.3f; s += lp * Mathf.Exp(-bt * 18f) * 0.35f; }       // snare
+                    float t = i / (float)SR; int bar = (int)(t / (4 * beat)); var f = fr[bar % 4];
+                    float inBar = t - bar * 4 * beat; int step = (int)(inBar / (beat * 0.5f)); float st = inBar - step * beat * 0.5f;
+                    float v = 0f;
+                    for (int k = 1; k < 4; k++) v += (Sine(f[k], t) + 0.5f * Sine(f[k] * 1.004f, t)) * 0.05f;                         // pad
+                    float bt = inBar % beat; v += (boss ? Saw(f[4], t) * 0.16f : Sine(f[4], t) * 0.3f) * Mathf.Exp(-bt * (boss ? 6f : 3f));   // bass
+                    v += Tri(f[1 + step % 3] * 2f, t) * Mathf.Exp(-st * 9f) * (boss ? 0.1f : 0.07f);                                  // arpeggio
+                    if (boss)
+                    {
+                        v += Sine(60f - bt * 60f, t) * Mathf.Exp(-bt * 14f) * 0.5f;                                                      // kick
+                        if ((int)(inBar / beat) % 2 == 1) { lp += (Noise() - lp) * 0.3f; v += lp * Mathf.Exp(-bt * 18f) * 0.35f; }       // snare
+                    }
+                    d[i] = Mathf.Clamp(v, -1f, 1f);
                 }
-                d[i] = Mathf.Clamp(s, -1f, 1f);
+                yield return null;
             }
             var clip = AudioClip.Create(boss ? "boss_loop" : "explore_loop", n, 1, SR, false); clip.SetData(d, 0);
-            return clip;
+            if (boss) bossLoop = clip; else explore = clip;
+            building = false;
         }
     }
 }

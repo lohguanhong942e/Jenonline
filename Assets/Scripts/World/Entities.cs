@@ -208,10 +208,12 @@ namespace Vesperhold
         void OnGUI()
         {
             var cam = Camera.main; if (cam == null) return;
-            var sp = cam.WorldToScreenPoint(transform.position);
+            var sp = cam.WorldToScreenPoint(transform.position); float sc = UiScale.Scale;
             var st = new GUIStyle(GUI.skin.label) { fontSize = 16, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
             GUI.color = new Color(color.r, color.g, color.b, 1 - t / 0.8f);
-            GUI.Label(new Rect(sp.x - 40, Screen.height - sp.y - 12, 80, 24), text, st);
+            UiScale.Begin();
+            GUI.Label(new Rect(sp.x / sc - 40, (Screen.height - sp.y) / sc - 12, 80, 24), text, st);
+            UiScale.End();
             GUI.color = Color.white;
         }
     }

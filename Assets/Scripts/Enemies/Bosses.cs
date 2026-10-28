@@ -276,7 +276,7 @@ namespace Vesperhold
             BossBrain.Attach(boss, data);
             boss.OnDeath += Defeated;
             GameManager.Instance.Toast(ar.boss == "boss" ? "The Bone Warden awakens!" : "Lord Vesper rises from his throne!");
-            GameManager.Instance.Shake(0.3f); Sfx.Play("boss", 1f);
+            GameManager.Instance.Shake(0.3f); Sfx.Play("boss", 1f); Haptics.Tap();
             if (MenuUI.Instance != null) MenuUI.Instance.BossIntro(ar.boss == "boss" ? "portrait_bone_warden" : "portrait_lord_vesper", ar.boss == "boss" ? "The Bone Warden" : "Lord Vesper");
         }
 

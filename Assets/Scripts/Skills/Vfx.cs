@@ -113,6 +113,7 @@ namespace Vesperhold
 
         public static void Sparks(Vector2 pos, int n, float speed, string spr = "burst_o", string tint = null, float size = 0.4f, float life = 0.5f, float gravity = 0f)
         {
+            n = Mathf.Max(1, Mathf.RoundToInt(n * Perf.ParticleScale));
             for (int i = 0; i < n; i++)
             {
                 float a = Random.value * Mathf.PI * 2f, sp = speed * (0.4f + Random.value * 0.8f);

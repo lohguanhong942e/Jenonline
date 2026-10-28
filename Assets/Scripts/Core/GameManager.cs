@@ -30,6 +30,11 @@ namespace Vesperhold
         {
             Instance = this;
             Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0;
+            Screen.autorotateToPortrait = false; Screen.autorotateToPortraitUpsideDown = false;
+            Screen.autorotateToLandscapeLeft = true; Screen.autorotateToLandscapeRight = true;
+            Screen.orientation = ScreenOrientation.AutoRotation;
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Physics2D.gravity = new Vector2(0, -Tuning.Gravity);
             GameData.Load();
             GameState.NewRun();
@@ -137,10 +142,18 @@ namespace Vesperhold
             Paused = false;
         }
 
-        void OnGUI()
+        void OnGUI() { UiScale.Begin(); Draw(); UiScale.End(); }
+
+        void Draw()
         {
-            float W = Screen.width, H = Screen.height;
+            float W = UiScale.W, H = UiScale.H;
             var big = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
+            if (UiScale.Mobile && UiScale.Portrait)
+            {
+                GUI.color = Color.black; GUI.DrawTexture(new Rect(0, 0, W, H), Texture2D.whiteTexture); GUI.color = Color.white;
+                GUI.Label(new Rect(20, H * 0.4f, W - 40, 100), "Rotate your phone to landscape", new GUIStyle(big) { fontSize = 26, wordWrap = true, alignment = TextAnchor.MiddleCenter });
+                return;
+            }
             var btn = UiArt.Button(22);
             if (showMenu)
             {
@@ -183,18 +196,20 @@ namespace Vesperhold
             }
             if (player == null) return;
             // HUD: class crest, level, health, mana, XP.
-            UiArt.Draw(new Rect(8, 6, 44, 44), UiArt.Tex("crest_" + GameState.ClassId));
-            GUI.Label(new Rect(58, 8, 300, 30), "LV " + GameState.Level + "   " + GameState.ClassId, big);
-            DrawIcon(new Rect(10, 42, 22, 22), "icon_heart");
-            Bar(new Rect(38, 44, 220, 18), player.Hp / (float)GameState.MaxHp, new Color(0.8f, 0.2f, 0.2f), player.Hp + " / " + GameState.MaxHp);
-            DrawIcon(new Rect(10, 66, 22, 22), "icon_mana");
-            Bar(new Rect(38, 69, 220, 12), player.Mp / (float)GameState.MaxMp, new Color(0.25f, 0.5f, 0.9f), "");
-            Bar(new Rect(38, 86, 220, 6), GameState.Xp / (float)GameData.XpToLevel(GameState.Level), new Color(0.9f, 0.75f, 0.3f), "");
+            float hl = UiScale.L, ht = UiScale.T;
+            UiArt.Draw(new Rect(hl + 8, ht + 6, 44, 44), UiArt.Tex("crest_" + GameState.ClassId));
+            GUI.Label(new Rect(hl + 58, ht + 8, 300, 30), "LV " + GameState.Level + "   " + GameState.ClassId, big);
+            DrawIcon(new Rect(hl + 10, ht + 42, 22, 22), "icon_heart");
+            Bar(new Rect(hl + 38, ht + 44, 220, 18), player.Hp / (float)GameState.MaxHp, new Color(0.8f, 0.2f, 0.2f), player.Hp + " / " + GameState.MaxHp);
+            DrawIcon(new Rect(hl + 10, ht + 66, 22, 22), "icon_mana");
+            Bar(new Rect(hl + 38, ht + 69, 220, 12), player.Mp / (float)GameState.MaxMp, new Color(0.25f, 0.5f, 0.9f), "");
+            Bar(new Rect(hl + 38, ht + 86, 220, 6), GameState.Xp / (float)GameData.XpToLevel(GameState.Level), new Color(0.9f, 0.75f, 0.3f), "");
             var right = new GUIStyle(big) { fontSize = 18, alignment = TextAnchor.MiddleLeft };
-            float rx = W - 14f;
-            rx -= 70; DrawIcon(new Rect(rx, 8, 22, 22), "icon_potion"); GUI.Label(new Rect(rx + 26, 8, 44, 22), GameState.Potions.ToString(), right);
-            rx -= 90; DrawIcon(new Rect(rx, 8, 22, 22), "icon_heart"); GUI.Label(new Rect(rx + 26, 8, 64, 22), GameState.Hearts.ToString(), right);
-            rx -= 120; DrawIcon(new Rect(rx, 8, 22, 22), "icon_gold"); GUI.Label(new Rect(rx + 26, 8, 94, 22), GameState.Gold.ToString(), right);
+            float rx = W - UiScale.R - 14f, ry = ht + 8;
+            rx -= 70; DrawIcon(new Rect(rx, ry, 22, 22), "icon_potion"); GUI.Label(new Rect(rx + 26, ry, 44, 22), GameState.Potions.ToString(), right);
+            rx -= 90; DrawIcon(new Rect(rx, ry, 22, 22), "icon_heart"); GUI.Label(new Rect(rx + 26, ry, 64, 22), GameState.Hearts.ToString(), right);
+            rx -= 120; DrawIcon(new Rect(rx, ry, 22, 22), "icon_gold"); GUI.Label(new Rect(rx + 26, ry, 94, 22), GameState.Gold.ToString(), right);
+            if (UiScale.Mobile && !(MenuUI.Instance != null && MenuUI.Instance.Open) && GUI.Button(new Rect(W - UiScale.R - 96, ry + 34, 84, 40), "Menu", UiArt.Button(15))) { Sfx.Play("click", 0.5f); if (MenuUI.Instance != null) MenuUI.Instance.OpenPause(); }
             var boss = BossBrain.Current;
             if (boss != null && boss.E != null)
             {
@@ -216,6 +231,12 @@ namespace Vesperhold
                 if (!UiArt.Draw(new Rect(W / 2 - bw / 2, H * 0.3f, bw, bw * 0.42f), UiArt.Tex("banner_gameover"))) GUI.Label(new Rect(0, H * 0.4f, W, 60), "YOU HAVE FALLEN", new GUIStyle(big) { fontSize = 40, alignment = TextAnchor.MiddleCenter });
                 GUI.color = old;
             }
+        }
+
+        // Phones pause the app when you switch away: save and open the pause menu so nothing is lost.
+        void OnApplicationPause(bool paused)
+        {
+            if (paused && InRun) { GameState.Save(); if (MenuUI.Instance != null) MenuUI.Instance.OpenPause(); }
         }
 
         void DrawIcon(Rect r, string name) { var t = UiArt.Tex(name); if (t != null) UiArt.Draw(r, t); }

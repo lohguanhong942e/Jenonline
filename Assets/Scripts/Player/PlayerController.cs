@@ -245,7 +245,7 @@ namespace Vesperhold
             if (invul > 0 || Dead) return;
             if (ShieldT > 0) { invul = 0.15f; Vfx.Burst(transform.position + Vector3.up * 0.8f, 1.6f, "y", 0.25f); return; }
             dmg = Mathf.Max(1, dmg - GameState.Defense);
-            Sfx.Play("hurt", 0.8f); Vfx.Sparks(transform.position + Vector3.up, 6, 4f, "burst_o", "r", 0.3f, 0.4f, 5f);
+            Sfx.Play("hurt", 0.8f); Haptics.Tap(); Vfx.Sparks(transform.position + Vector3.up, 6, 4f, "burst_o", "r", 0.3f, 0.4f, 5f);
             Hp -= dmg; invul = Tuning.Invulnerable; stun = 0.22f; dashT = 0; atkT = -1;
             rb.gravityScale = 1;
             int s = transform.position.x >= fromX ? 1 : -1;

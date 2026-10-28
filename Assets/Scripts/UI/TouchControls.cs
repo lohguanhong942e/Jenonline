@@ -20,16 +20,17 @@ namespace Vesperhold
 
         void Layout()
         {
-            float u = Mathf.Clamp(Mathf.Min(Screen.width, Screen.height) * 0.17f, 56f, 110f), m = u * 0.25f, y = Screen.height - u - m - 70f;
+            float u = Mathf.Clamp(Mathf.Min(UiScale.W, UiScale.H) * 0.17f, 56f, 110f), m = u * 0.25f, y = UiScale.H - UiScale.B - u - m - 70f;
+            float lx = UiScale.L, rx = UiScale.R;
             btns = new[]
             {
-                new Btn { Id = "L", Label = "<", R = new Rect(m, y, u, u) },
-                new Btn { Id = "R", Label = ">", R = new Rect(m * 2 + u, y, u, u) },
-                new Btn { Id = "J", Label = "JUMP", R = new Rect(Screen.width - u * 1.05f - m, y - u * 0.15f, u * 1.05f, u * 1.05f) },
-                new Btn { Id = "A", Label = "ATK", R = new Rect(Screen.width - u * 2.15f - m * 2, y + u * 0.1f, u, u) },
-                new Btn { Id = "D", Label = "DASH", R = new Rect(Screen.width - u * 1.9f - m, y - u * 1.3f, u * 0.8f, u * 0.8f) },
-                new Btn { Id = "P", Label = "POT", R = new Rect(Screen.width - u * 2.9f - m * 2, y - u * 0.5f, u * 0.7f, u * 0.7f) },
-                new Btn { Id = "E", Label = "USE", R = new Rect(Screen.width - u * 3.7f - m * 3, y + u * 0.1f, u * 0.7f, u * 0.7f) },
+                new Btn { Id = "L", Label = "<", R = new Rect(lx + m, y, u, u) },
+                new Btn { Id = "R", Label = ">", R = new Rect(lx + m * 2 + u, y, u, u) },
+                new Btn { Id = "J", Label = "JUMP", R = new Rect(UiScale.W - rx - u * 1.05f - m, y - u * 0.15f, u * 1.05f, u * 1.05f) },
+                new Btn { Id = "A", Label = "ATK", R = new Rect(UiScale.W - rx - u * 2.15f - m * 2, y + u * 0.1f, u, u) },
+                new Btn { Id = "D", Label = "DASH", R = new Rect(UiScale.W - rx - u * 1.9f - m, y - u * 1.3f, u * 0.8f, u * 0.8f) },
+                new Btn { Id = "P", Label = "POT", R = new Rect(UiScale.W - rx - u * 2.9f - m * 2, y - u * 0.5f, u * 0.7f, u * 0.7f) },
+                new Btn { Id = "E", Label = "USE", R = new Rect(UiScale.W - rx - u * 3.7f - m * 3, y + u * 0.1f, u * 0.7f, u * 0.7f) },
             };
             if (held.Length != btns.Length) held = new bool[btns.Length];
         }
@@ -45,7 +46,7 @@ namespace Vesperhold
                 foreach (var t in ts.touches)
                 {
                     if (!t.isInProgress) continue;
-                    Vector2 p = t.position.ReadValue(); var gp = new Vector2(p.x, Screen.height - p.y);
+                    Vector2 p = t.position.ReadValue(); float sc = UiScale.Scale; var gp = new Vector2(p.x / sc, (Screen.height - p.y) / sc);
                     for (int i = 0; i < btns.Length; i++)
                     {
                         if (!btns[i].R.Contains(gp)) continue;
@@ -58,7 +59,7 @@ namespace Vesperhold
             var mouse = Mouse.current;
             if (mouse != null && mouse.leftButton.isPressed)
             {
-                Vector2 p = mouse.position.ReadValue(); var gp = new Vector2(p.x, Screen.height - p.y);
+                Vector2 p = mouse.position.ReadValue(); float sc = UiScale.Scale; var gp = new Vector2(p.x / sc, (Screen.height - p.y) / sc);
                 for (int i = 0; i < btns.Length; i++) if (btns[i].R.Contains(gp)) { now[i] = true; if (!held[i]) switch (btns[i].Id) { case "A": TouchInput.AttackDown = true; break; case "D": TouchInput.DashDown = true; break; case "P": TouchInput.PotionDown = true; break; case "E": TouchInput.InteractDown = true; break; } }
             }
             TouchInput.Left = now[0]; TouchInput.Right = now[1]; TouchInput.JumpHeld = now[2];
@@ -66,7 +67,9 @@ namespace Vesperhold
             held = now;
         }
 
-        void OnGUI()
+        void OnGUI() { UiScale.Begin(); Draw(); UiScale.End(); }
+
+        void Draw()
         {
             if (!TouchInput.Active || GameManager.Instance == null || GameManager.Instance.InMenu || GameManager.Instance.Paused) return;
             Layout();

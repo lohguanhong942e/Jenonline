@@ -37,8 +37,8 @@ namespace Vesperhold
             var go = new GameObject("PostFx");
             var vol = go.AddComponent<Volume>(); vol.isGlobal = true;
             var prof = ScriptableObject.CreateInstance<VolumeProfile>();
-            var bloom = prof.Add<Bloom>(true); bloom.threshold.Override(0.85f); bloom.intensity.Override(1.0f); bloom.scatter.Override(0.65f);
-            var vig = prof.Add<Vignette>(true); vig.intensity.Override(0.3f); vig.smoothness.Override(0.6f);
+            var bloom = prof.Add<Bloom>(true); bloom.threshold.Override(0.85f); bloom.intensity.Override(UiScale.Mobile ? 0.7f : 1.0f); bloom.scatter.Override(0.65f);
+            if (!UiScale.Mobile) { var vig = prof.Add<Vignette>(true); vig.intensity.Override(0.3f); vig.smoothness.Override(0.6f); }
             var ca = prof.Add<ColorAdjustments>(true); ca.contrast.Override(10f); ca.saturation.Override(10f);
             vol.profile = prof;
             var data = cam.GetUniversalAdditionalCameraData(); data.renderPostProcessing = true;

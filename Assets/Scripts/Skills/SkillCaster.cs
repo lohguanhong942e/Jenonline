@@ -223,11 +223,13 @@ namespace Vesperhold
             return t;
         }
 
-        void OnGUI()
+        void OnGUI() { UiScale.Begin(); Draw(); UiScale.End(); }
+
+        void Draw()
         {
             if (cls == null || GameManager.Instance == null || GameManager.Instance.InMenu) return;
-            float slot = Mathf.Clamp(Screen.width / 17f, 40f, 58f), gap = 5f;
-            float total = 12 * slot + 11 * gap, x0 = (Screen.width - total) / 2f, y = Screen.height - slot - 22f;
+            float slot = Mathf.Clamp(UiScale.W / 17f, 40f, 58f), gap = 5f;
+            float total = 12 * slot + 11 * gap, x0 = (UiScale.W - total) / 2f, y = UiScale.H - UiScale.B - slot - 22f;
             var small = new GUIStyle(GUI.skin.label) { fontSize = 11, alignment = TextAnchor.UpperLeft, fontStyle = FontStyle.Bold };
             var mid = new GUIStyle(GUI.skin.label) { fontSize = 12, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
             for (int i = 0; i < 12; i++)
@@ -262,7 +264,7 @@ namespace Vesperhold
                     GUI.color = Color.white;
                 }
             }
-            if (flashT > 0) GUI.Label(new Rect(0, y - 30, Screen.width, 24), flash, new GUIStyle(mid) { fontSize = 16 });
+            if (flashT > 0) GUI.Label(new Rect(0, y - 30, UiScale.W, 24), flash, new GUIStyle(mid) { fontSize = 16 });
         }
     }
 }
