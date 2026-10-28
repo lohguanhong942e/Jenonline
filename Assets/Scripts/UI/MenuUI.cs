@@ -280,6 +280,7 @@ namespace Vesperhold
             Sfx.Muted = GUI.Toggle(new Rect(r.x, y, 300, 26), Sfx.Muted, " Mute everything"); y += 32;
             TouchInput.Force = GUI.Toggle(new Rect(r.x, y, 360, 26), TouchInput.Force, " Show touch controls (phones show them automatically)"); y += 32;
             Haptics.On = GUI.Toggle(new Rect(r.x, y, 300, 26), Haptics.On, " Vibration"); y += 32;
+            if (GUI.Button(new Rect(r.x, y, 200, 30), "Toggle fullscreen", btn)) WebBridge.ToggleFullscreen(); y += 40;
             Perf.BatterySaver = GUI.Toggle(new Rect(r.x, y, 360, 26), Perf.BatterySaver, " Battery saver (30 fps)"); y += 44;
             if (GUI.Button(new Rect(r.x, y, 160, 38), "Resume", btn)) SetOpen(false);
             if (GUI.Button(new Rect(r.x + 170, y, 160, 38), "Save game", btn)) { GameState.Save(); Note("Game saved."); }

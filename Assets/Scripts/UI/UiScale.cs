@@ -7,7 +7,7 @@ namespace Vesperhold
     // rounded corners. Use UiScale.W/H instead of Screen.width/height when laying out UI.
     public static class UiScale
     {
-        public static bool Mobile { get { return Application.isMobilePlatform || TouchInput.Active; } }
+        public static bool Mobile { get { return Application.isMobilePlatform || WebBridge.IsMobileBrowser || TouchInput.Active; } }
         public static float Scale { get { float h = Screen.height; return Mobile ? Mathf.Max(1f, h / 600f) : Mathf.Max(1f, h / 1000f); } }
         public static float W { get { return Screen.width / Scale; } }
         public static float H { get { return Screen.height / Scale; } }
@@ -36,9 +36,11 @@ namespace Vesperhold
         static float last;
         public static void Tap()
         {
-            if (!On || !Application.isMobilePlatform || Time.unscaledTime - last < 0.6f) return;
+            if (!On || !UiScale.Mobile || Time.unscaledTime - last < 0.6f) return;
             last = Time.unscaledTime;
-#if UNITY_ANDROID || UNITY_IOS
+#if UNITY_WEBGL
+            WebBridge.Vibrate(45);               // iPhone Safari ignores this; Android browsers buzz
+#elif UNITY_ANDROID || UNITY_IOS
             Handheld.Vibrate();
 #endif
         }
