@@ -2,13 +2,19 @@ using UnityEngine;
 
 namespace Vesperhold
 {
-    // Skeleton, bat, ghost and armor knight. Bosses (Bone Warden, Lord Vesper) are ported separately.
+    // Skeleton, bat, ghost and armor knight, plus the two bosses (their moves live in BossBrain).
     public class Enemy : MonoBehaviour
     {
         public string Type; public int Hp, MaxHp, Damage; public float DamageMul = 1f, GoldMul = 1f, XpMul = 1f;
         public System.Action<Enemy> OnDeath;
-        EnemyDef def; Rigidbody2D rb; SpriteRenderer sr; Color baseColor;
-        float hurtT, wander, dir = 1, phase, homeY, cd;
+        public int Face = 1;
+        public bool IsBoss { get { return Type == "boss" || Type == "lord"; } }
+        public Vector2 Mid { get { return (Vector2)transform.position + Vector2.up * (def != null ? def.h / 32f : 0.7f); } }
+        public Rigidbody2D Body { get { return rb; } }
+        public SpriteRenderer Renderer { get { return sr; } }
+        public bool Invulnerable;     // set by bosses while teleporting
+        EnemyDef def; Rigidbody2D rb; SpriteRenderer sr; Color baseColor, tint = Color.white;
+        float hurtT, wander, dir = 1, phase, homeY, cd, stunT, pullT; Vector2 pullTo; bool dead, hasArt;
         bool flies => Type == "bat" || Type == "ghost";
 
         public static Enemy Spawn(string type, Vector2 feet, bool elite, Transform parent)
@@ -32,10 +38,15 @@ namespace Vesperhold
             var box = gameObject.AddComponent<BoxCollider2D>();
             box.size = new Vector2(w, h); box.offset = new Vector2(0, h / 2f);
             box.sharedMaterial = new PhysicsMaterial2D { friction = 0f, bounciness = 0f };
+            string art = Type == "skeleton" ? "skeleton" : Type == "bat" ? "vampire_bat" : Type == "ghost" ? "ghost" : Type == "armor" ? "haunted_armor" : Type == "boss" ? "bone_dragon" : "vampire_noble";
+            float drawH = Type == "skeleton" ? 1.5f : Type == "bat" ? 0.9f : Type == "ghost" ? 1.3f : Type == "armor" ? 1.9f : Type == "boss" ? 3.4f : 2.5f;
             baseColor = Type == "skeleton" ? new Color(0.85f, 0.85f, 0.78f) : Type == "bat" ? new Color(0.5f, 0.3f, 0.6f)
                 : Type == "ghost" ? new Color(0.6f, 0.8f, 1f, 0.7f) : new Color(0.55f, 0.58f, 0.7f);
             if (elite) baseColor = Color.Lerp(baseColor, new Color(1f, 0.45f, 0.2f), 0.45f);
-            sr = SpriteFactory.Box(transform, "Body", baseColor, new Vector2(w, h), new Vector2(0, h / 2f), 8);
+            sr = SpriteFactory.Monster(transform, art, drawH, 8);
+            hasArt = sr != null;
+            if (hasArt) baseColor = elite ? new Color(1f, 0.7f, 0.55f) : Color.white;
+            else sr = SpriteFactory.Box(transform, "Body", baseColor, new Vector2(w, h), new Vector2(0, h / 2f), 8);
             homeY = transform.position.y; phase = Random.value * 6f; dir = Random.value < 0.5f ? -1 : 1;
             cd = 1 + Random.value * 2;
         }
@@ -44,12 +55,14 @@ namespace Vesperhold
         {
             if (GameManager.Instance.Paused) { rb.linearVelocity = Vector2.zero; return; }
             var p = PlayerController.Instance; if (p == null || p.Dead) return;
-            hurtT -= Time.deltaTime; cd -= Time.deltaTime;
+            hurtT -= Time.deltaTime; cd -= Time.deltaTime; stunT -= Time.deltaTime; pullT -= Time.deltaTime;
             Vector2 d = (Vector2)p.transform.position - (Vector2)transform.position;
             float dist = Mathf.Abs(d.x);
             var v = rb.linearVelocity;
             bool aware = dist < 7f && Mathf.Abs(d.y) < 3f;
-            if (hurtT > 0) { sr.color = Color.white; }
+            if (pullT > 0 && !IsBoss) { v = (pullTo - (Vector2)transform.position) * 10f; v.y = Mathf.Clamp(v.y, -2f, 6f); }
+            else if (stunT > 0) { v = new Vector2(0, flies ? 0 : v.y); sr.color = Color.Lerp(baseColor, tint, 0.7f); }
+            else if (hurtT > 0) { sr.color = hasArt ? new Color(1f, 0.45f, 0.45f) : Color.white; }
             else
             {
                 sr.color = baseColor;
@@ -67,7 +80,8 @@ namespace Vesperhold
                         break;
                 }
             }
-            if (Mathf.Abs(v.x) > 0.1f) sr.transform.localScale = new Vector3(Mathf.Sign(v.x) * Mathf.Abs(sr.transform.localScale.x), sr.transform.localScale.y, 1);
+            if (IsBoss) sr.transform.localScale = new Vector3(Face * Mathf.Abs(sr.transform.localScale.x), sr.transform.localScale.y, 1);
+            else if (Mathf.Abs(v.x) > 0.1f) sr.transform.localScale = new Vector3(Mathf.Sign(v.x) * Mathf.Abs(sr.transform.localScale.x), sr.transform.localScale.y, 1);
             rb.linearVelocity = v;
             // Contact damage.
             var pb = p.GetComponent<BoxCollider2D>().bounds; var eb = GetComponent<BoxCollider2D>().bounds;
@@ -85,15 +99,30 @@ namespace Vesperhold
 
         public void TakeDamage(int dm, int knockDir, int combo)
         {
+            if (dead || Invulnerable) return;
             Hp -= dm; hurtT = 0.12f;
-            float kb = (Type == "armor" ? 40f : 100f) / 16f * (combo == 2 ? 1.9f : 1f);
-            rb.linearVelocity = new Vector2(knockDir * kb, Type == "skeleton" ? 3.75f : 0f);
-            FloatingText.Spawn(transform.position + Vector3.up * 1.3f, dm.ToString(), Color.white);
+            if (!IsBoss)
+            {
+                float kb = (Type == "armor" ? 40f : 100f) / 16f * (combo == 2 ? 1.9f : 1f);
+                rb.linearVelocity = new Vector2(knockDir * kb, Type == "skeleton" ? 3.75f : 0f);
+            }
+            FloatingText.Spawn(transform.position + Vector3.up * (IsBoss ? 3.2f : 1.3f), dm.ToString(), Color.white);
             if (Hp <= 0) Die();
         }
 
+        // Freeze or stun for a short time; the colour key tints the enemy.
+        public void Stun(float t, string colorKey)
+        {
+            if (IsBoss) t *= 0.25f;
+            stunT = Mathf.Max(stunT, t); tint = Vfx.C(colorKey);
+        }
+
+        // Drag toward a point for t seconds (Chain Pull, Gravity Well).
+        public void Pull(Vector2 to, float t) { if (IsBoss) return; pullTo = to; pullT = t; }
+
         void Die()
         {
+            if (dead) return; dead = true;
             int gold = Mathf.RoundToInt(Random.Range(def.goldMin, def.goldMax + 1) * GoldMul);
             GameState.Gold += gold;
             if (Random.value < 0.4f) GameState.Hearts = Mathf.Min(99, GameState.Hearts + 1);

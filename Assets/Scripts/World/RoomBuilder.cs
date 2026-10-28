@@ -140,6 +140,12 @@ namespace Vesperhold
             root.transform.SetParent(transform, false);
             EntityRoot = root.transform;
             foreach (var e in Data.ents) EntityFactory.Spawn(e, this, root.transform);
+            if (Data.hasArena)
+            {
+                var ag = new GameObject("Arena");
+                ag.transform.SetParent(transform, false);
+                ag.AddComponent<ArenaController>().Init(Data);
+            }
             foreach (var t in Data.torches)
             {
                 var go = new GameObject("Torch");

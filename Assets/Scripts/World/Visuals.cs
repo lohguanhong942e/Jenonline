@@ -56,6 +56,27 @@ namespace Vesperhold
             return t;
         }
 
+        // Painted monster/character art from Resources, scaled to a world height with its feet at the pivot.
+        // Returns null when the PNG is missing so callers can fall back to a flat box.
+        public static SpriteRenderer Monster(Transform parent, string name, float height, int order)
+        {
+            var spr = LoadSprite("Art/Monsters/" + name, height);
+            if (spr == null) return null;
+            var go = new GameObject("Body");
+            go.transform.SetParent(parent, false);
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = spr; sr.sortingOrder = order;
+            return sr;
+        }
+
+        public static Sprite LoadSprite(string path, float height, bool pixel = false)
+        {
+            var tex = Resources.Load<Texture2D>(path);
+            if (tex == null) return null;
+            tex.filterMode = pixel ? FilterMode.Point : FilterMode.Bilinear;
+            return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.04f), tex.height / height);
+        }
+
         public static SpriteRenderer Box(Transform parent, string name, Color c, Vector2 size, Vector2 localPos, int order)
         {
             var go = new GameObject(name);

@@ -35,7 +35,8 @@ namespace Vesperhold
 
         public static int MaxHp { get { return 30 + 5 * (Level - 1) + 8 * HpUps + (Str - 4) * 2 + ArmorHp(); } }
         public static int MaxMp { get { return 20 + (Int - 4) * 4 + (Level - 1) * 3; } }
-        public static int Attack { get { return 4 + GameData.Swords.swords[Weapon].atk + (Level - 1) / 2 + Mathf.FloorToInt((Str - 4) * 0.6f); } }
+        public static float AtkBuff = 1f;      // War Cry / Blood Rage multiply attack while active
+        public static int Attack { get { return Mathf.RoundToInt((4 + GameData.Swords.swords[Weapon].atk + (Level - 1) / 2 + Mathf.FloorToInt((Str - 4) * 0.6f)) * AtkBuff); } }
         public static int Defense { get { return Armor; } }
         static int ArmorHp() { return Armor * 6; }
 

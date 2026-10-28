@@ -13,11 +13,14 @@ namespace Vesperhold
         public int Hp, Mp;
         public int Facing = 1;
         public bool Dead { get; private set; }
+        public float ShieldT, SpeedMul = 1f;          // set by skills (Iron Bulwark, Barrier, Haste)
+        public SpriteRenderer Body { get { return body; } }
+        Vector3 bodyScale = new Vector3(0.6f, 1.35f, 1f); Color bodyColor = new Color(0.55f, 0.75f, 0.9f);
 
         Rigidbody2D rb; BoxCollider2D box; SpriteRenderer body;
         float coyote, jumpBuffer, invul, stun, dashT, dashCd, atkT = -1, atkCd, comboT, mpRegen;
         int combo, jumps; bool airDash, jumpHeld, atkQueued, grounded;
-        readonly ContactFilter2D solidFilter = new ContactFilter2D();
+        ContactFilter2D solidFilter = new ContactFilter2D();
         readonly Collider2D[] buf = new Collider2D[16];
         readonly RaycastHit2D[] hits = new RaycastHit2D[8];
         readonly System.Collections.Generic.HashSet<Enemy> hitThisSwing = new System.Collections.Generic.HashSet<Enemy>();
@@ -43,14 +46,25 @@ namespace Vesperhold
             box.offset = new Vector2(0, 11f / 16f);          // pivot at the feet
             var mat = new PhysicsMaterial2D { friction = 0f, bounciness = 0f };
             box.sharedMaterial = mat;
-            body = SpriteFactory.Box(transform, "Body", new Color(0.55f, 0.75f, 0.9f), new Vector2(0.6f, 1.35f), new Vector2(0, 0.7f), 10);
+            body = SpriteFactory.Box(transform, "Body", bodyColor, new Vector2(0.6f, 1.35f), new Vector2(0, 0.7f), 10);
             solidFilter.useTriggers = false;
             Hp = GameState.MaxHp; Mp = GameState.MaxMp;
+        }
+
+        // Swap the placeholder box for the class portrait (Art/Characters). Pixel art, feet at the pivot.
+        public void ApplyClassArt(string classId)
+        {
+            string file = classId == "mage" ? "mage_female" : classId == "warrior" ? "warrior_male" : null;
+            var spr = file == null ? null : SpriteFactory.LoadSprite("Art/Characters/" + file, 1.6f, true);
+            if (spr == null) return;
+            body.sprite = spr; body.transform.localPosition = Vector3.zero;
+            bodyScale = Vector3.one; bodyColor = Color.white;
         }
 
         void Update()
         {
             if (Dead || GameManager.Instance.Paused) return;
+            ShieldT -= Time.deltaTime;
             var kb = Keyboard.current; if (kb == null) return;
             float dt = Time.deltaTime;
             invul -= dt; stun -= dt; dashCd -= dt; atkCd -= dt; comboT -= dt; coyote -= dt; jumpBuffer -= dt;
@@ -79,7 +93,7 @@ namespace Vesperhold
                 rb.gravityScale = 1;
                 if (stun <= 0)
                 {
-                    float target = ax * Tuning.RunSpeed * (atkT >= 0 ? 0.4f : 1f);
+                    float target = ax * Tuning.RunSpeed * SpeedMul * (atkT >= 0 ? 0.4f : 1f);
                     v.x = Mathf.MoveTowards(v.x, target, (grounded ? 90f : 55f) * dt);
                     if (Mathf.Abs(ax) > 0.1f && atkT < 0) Facing = ax > 0 ? 1 : -1;
                 }
@@ -93,8 +107,8 @@ namespace Vesperhold
             }
             rb.linearVelocity = v;
             UpdateAttack(dt);
-            body.transform.localScale = new Vector3(0.6f * Facing, 1.35f, 1);
-            body.color = invul > 0 && Mathf.FloorToInt(Time.time * 20) % 2 == 0 ? new Color(1, 1, 1, 0.4f) : new Color(0.55f, 0.75f, 0.9f);
+            body.transform.localScale = new Vector3(bodyScale.x * Facing, bodyScale.y, 1);
+            body.color = invul > 0 && Mathf.FloorToInt(Time.time * 20) % 2 == 0 ? new Color(1, 1, 1, 0.4f) : bodyColor;
         }
 
         bool CheckGround()
@@ -186,6 +200,7 @@ namespace Vesperhold
         public void Hurt(int dmg, float fromX, float knock = 7f)
         {
             if (invul > 0 || Dead) return;
+            if (ShieldT > 0) { invul = 0.15f; Vfx.Burst(transform.position + Vector3.up * 0.8f, 1.6f, "y", 0.25f); return; }
             dmg = Mathf.Max(1, dmg - GameState.Defense);
             Hp -= dmg; invul = Tuning.Invulnerable; stun = 0.22f; dashT = 0; atkT = -1;
             rb.gravityScale = 1;
@@ -193,6 +208,25 @@ namespace Vesperhold
             rb.linearVelocity = new Vector2(s * knock, 8f);
             GameManager.Instance.Shake(0.15f);
             if (Hp <= 0) { Hp = 0; Dead = true; GameManager.Instance.OnPlayerDied(); }
+        }
+
+        // Skill helpers: burst of velocity, wall-aware horizontal teleport, short invulnerability.
+        public void Launch(Vector2 v) { rb.linearVelocity = v; stun = 0; }
+        public void GrantInvul(float t) { invul = Mathf.Max(invul, t); }
+        public void Blink(float dx, float invulT)
+        {
+            Vector2 from = rb.position, dir = new Vector2(Mathf.Sign(dx), 0);
+            float allowed = Mathf.Abs(dx);
+            var res = Physics2D.BoxCastAll(from + new Vector2(0, 0.7f), new Vector2(box.size.x * 0.9f, box.size.y * 0.85f), 0, dir, allowed);
+            foreach (var h in res)
+            {
+                var c = h.collider;
+                if (c == null || c == box || c.isTrigger || c.usedByEffector || c.GetComponentInParent<Enemy>() != null) continue;
+                allowed = Mathf.Min(allowed, Mathf.Max(0f, h.distance - 0.05f));
+            }
+            rb.position = from + dir * allowed; transform.position = rb.position;
+            rb.linearVelocity = new Vector2(0, Mathf.Max(0, rb.linearVelocity.y));
+            invul = Mathf.Max(invul, invulT);
         }
 
         public void Heal(int n) { Hp = Mathf.Min(GameState.MaxHp, Hp + n); }

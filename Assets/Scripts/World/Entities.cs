@@ -37,6 +37,12 @@ namespace Vesperhold
             }
         }
 
+        public static void SpawnRelic(Vector2 feet, string kind, Transform parent)
+        {
+            var r = Make<Relic>(parent, feet + Vector2.up * 0.5f, new Color(0.5f, 1f, 1f), new Vector2(0.6f, 0.6f));
+            r.Kind = kind;
+        }
+
         static T Make<T>(Transform parent, Vector2 feet, Color c, Vector2 size) where T : MonoBehaviour
         {
             var go = new GameObject(typeof(T).Name);
